@@ -1,7 +1,7 @@
 # CloudDocs RAG Project Memory
 
 ## Project Overview
-This is a complete RAG (Retrieval-Augmented Generation) system built from scratch using real AWS and Azure cloud documentation. The goal is to teach every concept in modern RAG implementation while building something practical and cost-effective.
+This repository captures a complete RAG (Retrieval-Augmented Generation) system built on real AWS and Azure cloud documentation. It is designed to demonstrate how document ingestion, vector search, and LLM grounding can support practical cloud knowledge applications.
 
 ## Tech Stack
 - **LLM**: Groq Llama 3 8B (fast inference, cost-effective)
@@ -21,11 +21,11 @@ Real AWS/Azure Docs → Web Scraping → HTML Cleaning → Sliding Window Chunki
 - **Production-ready**: Error handling, streaming, conversation memory
 - **Extensible**: Easy to add more cloud providers or document sources
 
-## Learning Goals
-1. **Document Ingestion**: Web scraping, HTML parsing, text chunking
-2. **Vector Embeddings**: Text-to-vector conversion, similarity search
-3. **RAG Pipeline**: Retrieval + generation, prompt engineering
-4. **Interactive Chat**: Conversation memory, query rewriting, streaming
+## Purpose
+- document a grounded RAG pipeline for cloud documentation
+- show how to use vector search for provider docs
+- provide a reproducible architecture for cloud knowledge retrieval
+- illustrate real-world value by reducing hallucination and improving search relevance
 
 ## File Structure
 - `step1_ingest.py` - Fetch and chunk cloud documentation
@@ -86,7 +86,7 @@ python step4_chat.py        # Interactive chat
 
 ## Notes for Claude
 - This project uses real cloud documentation, not synthetic data
-- All concepts are explained in code comments and CONCEPTS_GUIDE.md
-- The system is designed to be educational first, optimized second
+- All concepts are documented in code comments and `CONCEPTS_GUIDE.md`
+- The system is designed for practical clarity and cost efficiency
 - Cost is kept extremely low to be accessible to everyone
-- Each step builds on the previous one, teaching incrementally
+- The implementation is structured to support incremental extension

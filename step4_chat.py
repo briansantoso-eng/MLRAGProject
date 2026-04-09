@@ -1,15 +1,8 @@
 """
-Step 4: Interactive RAG Chat
+Interactive RAG chat for the CloudDocs RAG system.
 
-CONCEPTS YOU'LL LEARN:
-- Conversation memory and context management
-- Query rewriting for follow-up questions
-- Streaming responses for better UX
-- Multi-turn dialogue with RAG
-- Automatic context preservation
-
-This script creates an interactive chat interface that maintains
-conversation history and provides contextual RAG responses.
+This module provides a conversational interface with history and
+context-aware retrieval for follow-up questions.
 """
 
 import chromadb

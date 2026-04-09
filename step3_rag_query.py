@@ -1,15 +1,8 @@
 """
-Step 3: RAG Query Pipeline
+RAG query pipeline for the CloudDocs RAG system.
 
-CONCEPTS YOU'LL LEARN:
-- Retrieval-Augmented Generation (RAG) architecture
-- Vector similarity search with filtering
-- Prompt engineering for grounded answers
-- Cost estimation and token counting
-- Multi-source answer synthesis
-
-This script demonstrates the complete RAG loop: retrieve relevant
-chunks, feed them to an LLM, and generate grounded answers.
+This module retrieves relevant document chunks, constructs grounded prompts,
+and generates answers using a modern LLM.
 """
 
 import chromadb

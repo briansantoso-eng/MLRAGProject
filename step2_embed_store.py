@@ -1,15 +1,8 @@
 """
-Step 2: Embedding and Vector Storage
+Embedding and vector storage for the CloudDocs RAG system.
 
-CONCEPTS YOU'LL LEARN:
-- Text embeddings (converting text to numerical vectors)
-- Cosine similarity and vector search
-- ChromaDB vector database and HNSW indexing
-- Incremental embedding (only process new documents)
-- Metadata filtering for retrieval
-
-This script converts text chunks into embeddings and stores them
-in a vector database for fast similarity search.
+This module converts text chunks into vector embeddings and stores them
+in a ChromaDB vector database for fast similarity search.
 """
 
 import json

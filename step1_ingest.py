@@ -1,15 +1,8 @@
 """
-Step 1: Document Ingestion and Chunking
+Document ingestion and chunking for the CloudDocs RAG system.
 
-CONCEPTS YOU'LL LEARN:
-- Web scraping with requests + BeautifulSoup
-- HTML cleaning and text extraction
-- Sliding window chunking algorithm
-- Document metadata preservation
-- Error handling for web requests
-
-This script fetches real AWS and Azure documentation pages,
-cleans the HTML, and splits them into meaningful chunks with metadata.
+This module fetches AWS and Azure documentation pages, cleans HTML,
+and splits content into meaningful chunks with metadata.
 """
 
 import requests

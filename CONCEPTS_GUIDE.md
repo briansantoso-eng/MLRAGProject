@@ -1,6 +1,6 @@
 # RAG Concepts Deep Dive
 
-This guide explains every major concept in the CloudDocs RAG system. Each section includes code examples, mathematical formulas where relevant, and practical implications for building RAG systems.
+This guide documents major concepts used by the CloudDocs RAG system. Each section includes practical explanations, code examples, and implementation insights for building retrieval-augmented systems.
 
 ## 1. Text Embeddings
 

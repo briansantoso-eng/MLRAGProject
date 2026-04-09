@@ -9,20 +9,29 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+def normalize_api_key(value):
+    """Normalize API key string by trimming whitespace and surrounding quotes."""
+    if not value:
+        return None
+    value = value.strip()
+    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+        value = value[1:-1].strip()
+    return value
+
 # Try to get API keys from environment or Streamlit secrets
 def get_api_key(key_name):
     """Get API key from environment or Streamlit secrets."""
     # First try environment variable
     value = os.getenv(key_name)
     if value:
-        return value
+        return normalize_api_key(value)
     
     # Then try Streamlit secrets
     try:
         import streamlit as st
         if key_name in st.secrets:
-            return st.secrets[key_name]
-    except:
+            return normalize_api_key(st.secrets[key_name])
+    except Exception:
         pass
     
     return None
@@ -35,9 +44,15 @@ if not GROQ_API_KEY:
     raise ValueError(
         "❌ GROQ_API_KEY not found!\n"
         "For Streamlit Cloud: Go to 'Manage app' → 'Settings' → 'Secrets' and add:\n"
-        "GROQ_API_KEY = 'gsk_your_key_here'\n"
+        "GROQ_API_KEY = \"gsk_your_key_here\"\n"
         "For local development: Add to .env file:\n"
         "GROQ_API_KEY=gsk_your_key_here"
+    )
+
+if not GROQ_API_KEY.startswith("gsk_"):
+    raise ValueError(
+        "❌ GROQ_API_KEY looks invalid. "
+        "Make sure you copied the key from https://console.groq.com exactly and did not include extra quotes or spaces."
     )
 
 # Embedding Configuration (using free local model)

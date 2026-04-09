@@ -9,7 +9,8 @@ if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
     os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 
 # Verify API key exists
-if not os.getenv('GROQ_API_KEY'):
+key = os.getenv('GROQ_API_KEY')
+if not key:
     st.error(
         "❌ **GROQ_API_KEY not found!**\n\n"
         "**To fix:**\n"
@@ -18,6 +19,13 @@ if not os.getenv('GROQ_API_KEY'):
         "3. Add: `GROQ_API_KEY = \"gsk_your_key_here\"`\n"
         "4. Click **Save**\n\n"
         "Get your key: https://console.groq.com"
+    )
+    st.stop()
+
+if not key.startswith('gsk_'):
+    st.error(
+        "❌ The loaded GROQ_API_KEY does not look valid.\n"
+        "Please verify the key is copied exactly from the Groq Console without extra quotes or whitespace."
     )
     st.stop()
 

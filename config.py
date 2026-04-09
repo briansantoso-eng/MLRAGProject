@@ -6,15 +6,39 @@ Centralizes all settings, API keys, and hyperparameters.
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
 
+# Try to get API keys from environment or Streamlit secrets
+def get_api_key(key_name):
+    """Get API key from environment or Streamlit secrets."""
+    # First try environment variable
+    value = os.getenv(key_name)
+    if value:
+        return value
+    
+    # Then try Streamlit secrets
+    try:
+        import streamlit as st
+        if key_name in st.secrets:
+            return st.secrets[key_name]
+    except:
+        pass
+    
+    return None
+
 # API Keys
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Optional - for fallback
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENAI_API_KEY = get_api_key("OPENAI_API_KEY")
+GROQ_API_KEY = get_api_key("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    raise ValueError("Please set GROQ_API_KEY in your .env file (needed for LLM responses)")
+    raise ValueError(
+        "❌ GROQ_API_KEY not found!\n"
+        "For Streamlit Cloud: Go to 'Manage app' → 'Settings' → 'Secrets' and add:\n"
+        "GROQ_API_KEY = 'gsk_your_key_here'\n"
+        "For local development: Add to .env file:\n"
+        "GROQ_API_KEY=gsk_your_key_here"
+    )
 
 # Embedding Configuration (using free local model)
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"  # Free SentenceTransformer model

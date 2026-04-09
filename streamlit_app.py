@@ -2,6 +2,25 @@ import os
 import sys
 import streamlit as st
 
+# Load Streamlit secrets into environment before importing other modules
+if hasattr(st, 'secrets') and 'GROQ_API_KEY' in st.secrets:
+    os.environ['GROQ_API_KEY'] = st.secrets['GROQ_API_KEY']
+if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+    os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
+
+# Verify API key exists
+if not os.getenv('GROQ_API_KEY'):
+    st.error(
+        "❌ **GROQ_API_KEY not found!**\n\n"
+        "**To fix:**\n"
+        "1. Click **'Manage app'** (bottom right)\n"
+        "2. Go to **Settings → Secrets**\n"
+        "3. Add: `GROQ_API_KEY = \"gsk_your_key_here\"`\n"
+        "4. Click **Save**\n\n"
+        "Get your key: https://console.groq.com"
+    )
+    st.stop()
+
 # Ensure vector DB is initialized on first run
 @st.cache_resource
 def initialize_knowledge_base():

@@ -102,6 +102,38 @@ DATA_SOURCES = {
             "title": "Azure Functions",
             "category": "compute"
         }
+    ],  
+    "gcp": [
+        {
+            "url": "https://cloud.google.com/compute/docs",
+            "title": "GCP Compute",
+            "category": "compute"
+        },
+        {
+            "url": "https://cloud.google.com/storage/docs",
+            "title": "GCP Storage",
+            "category": "storage"
+        },
+        {
+            "url": "https://cloud.google.com/sql/docs",
+            "title": "GCP Cloud SQL",
+            "category": "database"
+        },
+        {
+            "url": "https://cloud.google.com/iam/docs",
+            "title": "GCP IAM",
+            "category": "security"
+        },
+        {
+            "url": "https://cloud.google.com/vpc/docs",
+            "title": "GCP VPC",
+            "category": "networking"
+        },
+        {
+            "url": "https://cloud.google.com/functions/docs",
+            "title": "GCP Cloud Functions",
+            "category": "compute"
+        }
     ]
 }
 

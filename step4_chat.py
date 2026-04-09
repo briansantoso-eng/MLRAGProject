@@ -38,7 +38,10 @@ class RAGChat:
             path=CHROMA_DB_PATH,
             settings=Settings(anonymized_telemetry=False)
         )
-        self.collection = self.chroma_client.get_collection(name=COLLECTION_NAME)
+        self.collection = self.chroma_client.get_or_create_collection(
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"}
+        )
 
         # Conversation memory
         self.conversation_history = []

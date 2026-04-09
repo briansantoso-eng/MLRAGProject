@@ -78,6 +78,12 @@ The system successfully ingests and provides grounded answers from multi-cloud d
 
 > Note: The screenshot file is stored at `ss/ss1.png` in this repository.
 
+## Live Demo
+
+Try the app live on Streamlit Cloud:
+
+**[https://mlragproject-e58tnq5unou9vsmswy4wrz.streamlit.app/](https://mlragproject-e58tnq5unou9vsmswy4wrz.streamlit.app/)**
+
 ## Setup
 
 1. Install dependencies:

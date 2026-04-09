@@ -1,181 +1,97 @@
 # CloudDocs RAG System
 
-A complete Retrieval-Augmented Generation (RAG) system built from scratch using real AWS and Azure documentation. This project teaches you every concept in modern RAG implementation while building something practical and cost-effective.
+CloudDocs RAG is a practical retrieval-augmented generation project built around real cloud provider documentation. It demonstrates how to combine document ingestion, vector search, and large language models to deliver grounded answers from AWS and Azure technical content.
 
-## 🎯 What You'll Learn
+## What this project does
 
-This 4-step project covers the complete RAG pipeline:
+- Ingests real AWS and Azure documentation
+- Converts documentation into searchable vector embeddings
+- Stores content in a local ChromaDB vector store
+- Retrieves relevant passages for user queries
+- Generates grounded answers using a modern LLM
+- Supports conversational follow-up with memory and query rewriting
 
-1. **Document Ingestion** - Web scraping, HTML cleaning, chunking algorithms
-2. **Vector Embeddings** - Text-to-vector conversion, similarity search, ChromaDB
-3. **RAG Querying** - Retrieval + generation, prompt engineering, cost optimization
-4. **Interactive Chat** - Conversation memory, streaming responses, query rewriting
+## Why it matters
 
-## 🏗️ Architecture
+Modern enterprise search and knowledge systems need answers that are both relevant and verifiable. This project shows how to:
 
-```
-Web Pages → Ingestion → Chunking → Embeddings → Vector DB → Retrieval → Groq LLM → Answer
-     ↓           ↓          ↓          ↓           ↓          ↓         ↓        ↓
-   AWS/Azure   BeautifulSoup Sliding   OpenAI     ChromaDB   Cosine    Llama 3   Grounded
-   Docs        Cleaning     Window     text-emb-3-small     Similarity           Response
-```
+- reduce hallucination by grounding responses in actual documentation
+- enable cloud operations teams to query provider docs quickly
+- speed up troubleshooting, onboarding, and architectural research
+- build a reusable RAG pipeline for internal knowledge bases
 
-## 🚀 Quick Start
+## Real-world contribution
 
-### Prerequisites
-- Python 3.11+
-- OpenAI API key (free tier works)
+CloudDocs RAG is useful for teams that need:
 
-### Setup
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+- developer support for cloud architecture decisions
+- fast access to multi-cloud documentation without manual search
+- a proof-of-concept for integrating LLMs with real knowledge sources
+- a low-cost pipeline for searchable technical content
 
-# 2. Set up environment
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
+## Key components
 
-# 3. Run the pipeline
-python step1_ingest.py      # Fetch & chunk docs (~2 minutes)
-python step2_embed_store.py # Create embeddings (~$0.001)
-python step3_rag_query.py   # Test RAG queries
-python step4_chat.py        # Interactive chat
-```
+- `step1_ingest.py`: fetches and processes cloud docs into structured chunks
+- `step2_embed_store.py`: creates and stores vector embeddings in ChromaDB
+- `step3_rag_query.py`: runs retrieval-augmented queries with grounding
+- `step4_chat.py`: provides a conversational interface with context handling
+- `config.py`: central configuration for models, chunking, and retrieval
 
-## 📚 Step-by-Step Guide
+## Architecture
 
-### Step 1: Document Ingestion (`step1_ingest.py`)
-**Concepts:** Web scraping, HTML parsing, sliding window chunking
+The system connects these layers:
 
-This script fetches 12 real documentation pages from AWS and Azure, cleans the HTML, and splits them into overlapping chunks. Each chunk preserves metadata (source URL, provider, category) for later filtering.
+- source documentation -> content ingestion
+- text cleaning -> chunking with overlap
+- vector embedding generation -> vector database storage
+- similarity retrieval -> prompt construction
+- LLM generation -> grounded response output
 
-**What it does:**
-- Scrapes AWS Lambda, S3, EC2, RDS, IAM, VPC
-- Scrapes Azure VMs, Storage, SQL DB, AAD, VNet, Functions
-- Cleans HTML using BeautifulSoup
-- Applies sliding window chunking (1000 chars, 200 overlap)
-- Saves structured JSON with metadata
+## Practical use cases
 
-### Step 2: Embedding & Storage (`step2_embed_store.py`)
-**Concepts:** Text embeddings, vector databases, cosine similarity, HNSW indexing
+- internal knowledge search for platform engineering teams
+- QA support for cloud operations and security teams
+- training datasets for enterprise RAG systems
+- evaluating cloud provider feature comparisons and best practices
 
-Converts text chunks into 1536-dimensional vectors using OpenAI's `text-embedding-3-small` model, then stores them in ChromaDB for fast similarity search.
+## Setup
 
-**What it does:**
-- Embeds each chunk using OpenAI API
-- Stores vectors in ChromaDB with metadata
-- Implements incremental processing (skips existing docs)
-- Tests similarity search with sample queries
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Configure environment:
+   ```bash
+   cp .env.example .env
+   ```
+3. Provide your OpenAI API key in `.env`
 
-### Step 3: RAG Query Pipeline (`step3_rag_query.py`)
-**Concepts:** Retrieval-augmented generation, prompt engineering, token counting
+## How to run
 
-Demonstrates the complete RAG loop: retrieve relevant chunks, feed them to GPT-4o-mini, generate grounded answers with cost tracking.
+Use the available scripts to build and query the system:
 
-**What it does:**
-- Takes natural language queries
-- Retrieves top-5 similar chunks
-- Builds grounded prompts with sources
-- Generates answers using GPT-4o-mini
-- Shows similarity scores and cost estimates
-- Supports provider filtering (AWS-only, Azure-only)
+- `python step1_ingest.py`
+- `python step2_embed_store.py`
+- `python step3_rag_query.py`
+- `python step4_chat.py`
 
-### Step 4: Interactive Chat (`step4_chat.py`)
-**Concepts:** Conversation memory, query rewriting, streaming responses
+## Benefits of this approach
 
-Creates an interactive chat interface that maintains conversation history and handles follow-up questions intelligently.
+- grounded answers from source documentation
+- a clear vector search pipeline for cloud docs
+- minimal cost with local embeddings and efficient LLM use
+- extensible design for additional providers and content types
 
-**What it does:**
-- Maintains conversation context
-- Rewrites vague follow-ups ("how does it work?") with history
-- Streams responses for better UX
-- Supports provider filtering
-- Memory management (auto-trims old messages)
+## Extending this project
 
-## 💰 Cost Breakdown
+This codebase is designed to scale beyond the initial cloud docs set:
 
-Using free local embeddings + Groq for inference:
-
-- **Ingestion:** Free (just bandwidth)
-- **Embeddings:** Free (runs locally with SentenceTransformers)
-- **Queries:** ~$0.001 per question (Groq inference only)
-- **Chat:** ~$0.005 per conversation
-
-**Total cost for full project:** <$0.05
-
-## 🎮 Sample Queries to Try
-
-```
-"How do I create a serverless function?"
-"What are the differences between AWS Lambda and Azure Functions?"
-"How do I store files in the cloud?"
-"What are security best practices for cloud databases?"
-"How do I set up virtual networks?"
-```
-
-## 🔧 Configuration
-
-All settings are in `config.py`:
-
-- **Embedding:** `all-MiniLM-L6-v2` (free local SentenceTransformer)
-- **LLM:** `llama-3.1-8b-instant` (Groq's fast Llama 3.1 model)
-- **Chunking:** 1000 chars with 200 char overlap
-- **Retrieval:** Top 5 chunks, cosine similarity
-- **Chat:** 10 message memory, streaming enabled
-
-## 📖 Key Concepts Explained
-
-### Text Embeddings
-Text is converted to numerical vectors where similar meanings have similar vectors. "Cat" and "feline" will be close in vector space even though they share no common letters.
-
-### Cosine Similarity
-Measures the angle between vectors. Values from -1 (opposite) to 1 (identical). For RAG, higher similarity means more relevant content.
-
-### Sliding Window Chunking
-Splits text into overlapping chunks to maintain context. Prevents losing meaning at arbitrary cut points.
-
-### Retrieval-Augmented Generation
-Combines information retrieval (finding relevant docs) with generation (synthesizing answers). Prevents hallucination by grounding responses in actual documentation.
-
-### Vector Databases
-Specialized databases for storing and searching high-dimensional vectors. Use HNSW indexing for sub-second searches through millions of documents.
-
-## 🚨 Troubleshooting
-
-**"Module not found" errors:**
-```bash
-pip install -r requirements.txt
-```
-
-**OpenAI API errors:**
-- Check your API key in `.env`
-- Ensure you have credits in your OpenAI account
-
-**No documents found:**
-- Run `step1_ingest.py` first
-- Check `processed_documents.json` was created
-
-**Empty responses:**
-- Run `step2_embed_store.py` to create the vector database
-- Check `chroma_db` folder exists
-
-## 🔄 Extending the Project
-
-Ideas for enhancement:
-- Add more cloud providers (GCP, DigitalOcean)
-- Implement hybrid search (keyword + vector)
-- Add document freshness checking
-- Create a web UI with Streamlit
-- Add multi-modal support (images, diagrams)
-- Implement agentic RAG with tool calling
-
-## 📚 Further Reading
-
-- [Retrieval-Augmented Generation paper](https://arxiv.org/abs/2005.11401)
-- [OpenAI Embeddings guide](https://platform.openai.com/docs/guides/embeddings)
-- [ChromaDB documentation](https://docs.trychroma.com/)
-- [BeautifulSoup documentation](https://www.crummy.com/software/BeautifulSoup/)
+- add GCP or other provider documentation
+- support hybrid keyword + vector search
+- build a web-based knowledge assistant
+- add document freshness and source metadata filters
+- enable multi-modal retrieval with diagrams or images
 
 ---
 
-**Built for learning, optimized for cost, powered by real documentation.**
+CloudDocs RAG is focused on turning documentation into reliable, reusable knowledge rather than teaching a single workflow step-by-step.

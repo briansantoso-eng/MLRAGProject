@@ -64,7 +64,7 @@ The system connects these layers:
    ```bash
    cp .env.example .env
    ```
-3. Provide your OpenAI API key in `.env`
+3. Provide your Groq/Open AI API
 
 ## How to run
 
@@ -82,16 +82,4 @@ Use the available scripts to build and query the system:
 - minimal cost with local embeddings and efficient LLM use
 - extensible design for additional providers and content types
 
-## Extending this project
-
-This codebase is designed to scale beyond the initial cloud docs set:
-
-- add GCP or other provider documentation
-- support hybrid keyword + vector search
-- build a web-based knowledge assistant
-- add document freshness and source metadata filters
-- enable multi-modal retrieval with diagrams or images
-
 ---
-
-CloudDocs RAG is focused on turning documentation into reliable, reusable knowledge rather than teaching a single workflow step-by-step.

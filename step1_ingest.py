@@ -136,35 +136,20 @@ def main():
 
     all_documents = []
 
-    # Process AWS documentation
-    print("📚 Processing AWS documentation...")
-    for doc_config in DATA_SOURCES["aws"]:
-        doc = fetch_document(
-            doc_config["url"],
-            doc_config["title"],
-            doc_config["category"],
-            "aws"
-        )
-        if doc:
-            all_documents.append(doc)
+    for provider, docs in DATA_SOURCES.items():
+        print(f"\n☁️  Processing {provider.upper()} documentation...")
+        for doc_config in docs:
+            doc = fetch_document(
+                doc_config["url"],
+                doc_config["title"],
+                doc_config["category"],
+                provider
+            )
+            if doc:
+                all_documents.append(doc)
 
-        # Be respectful to the servers
-        time.sleep(1)
-
-    # Process Azure documentation
-    print("\n☁️  Processing Azure documentation...")
-    for doc_config in DATA_SOURCES["azure"]:
-        doc = fetch_document(
-            doc_config["url"],
-            doc_config["title"],
-            doc_config["category"],
-            "azure"
-        )
-        if doc:
-            all_documents.append(doc)
-
-        # Be respectful to the servers
-        time.sleep(1)
+            # Be respectful to the servers
+            time.sleep(1)
 
     # Save the processed documents
     output_file = "processed_documents.json"

@@ -74,9 +74,9 @@ The system successfully ingests and provides grounded answers from multi-cloud d
 🤖 You're looking for a brief comparison between AWS Lambda and EC2 instances. Both are compute services offered by AWS, but they serve different purposes and have distinct characteristics. **Lambda** is a serverless, event-driven compute service that runs code without the need to manage servers. You write and organize your code in Lambda functions, which are triggered by events or API calls. Lambda manages the underlying infrastructure, scaling up and down automatically, and charges you only for the compute time used. This makes it ideal for tasks that require short bursts of compute power, such as file processing, long-running workflows, or database operations. **EC2 instances**, on the other hand, are virtual servers that you can use to run your own applications and services. You have full control over the instance, including the operating system, software, and configuration. EC2 instances are suitable for applications that require a high degree of customization, control, or long-term compute resources. Key differences between Lambda and EC2 instances: * **Serverless vs. Server-based**: Lambda is serverless, while EC2 instances are server-based. * **Compute model**: Lambda uses a pay-per-use pricing model, while EC2 instances are billed by the hour or by the instance type. * **Scalability**: Lambda scales automatically, while EC2 instances require manual scaling or use of Auto Scaling. * **Management**: Lambda manages the underlying infrastructure, while EC2 instances require manual management and maintenance. In summary, if you need a flexible, scalable, and cost-effective solution for short-lived tasks or event-driven computing, Lambda is a great choice. If you require a high degree of customization, control, or long-term compute resources, EC2 instances might be a better fit. Do you have any specific use cases or requirements that might help me provide a more tailored comparison? 
 ```
 
-![RAG Chat Screenshot](ss\ss1.png)
+![RAG Chat Screenshot](ss/ss1.png)
 
-> Note: Save the screenshot image as `screenshot.png` in this repository and update the file name if needed.
+> Note: The screenshot file is stored at `ss/ss1.png` in this repository.
 
 ## Setup
 

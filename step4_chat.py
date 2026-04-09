@@ -8,11 +8,10 @@ context-aware retrieval for follow-up questions.
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
-import openai
 import groq
 import tiktoken
 from config import (
-    OPENAI_API_KEY, GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL, TEMPERATURE, MAX_TOKENS,
+    GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL, TEMPERATURE, MAX_TOKENS,
     CHROMA_DB_PATH, COLLECTION_NAME, TOP_K_RETRIEVAL, MAX_CONVERSATION_HISTORY,
     STREAMING_ENABLED
 )
@@ -21,7 +20,6 @@ import json
 # Initialize clients
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 groq_client = groq.Groq(api_key=GROQ_API_KEY)
-openai_client = openai.OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 class RAGChat:
     """
@@ -181,7 +179,6 @@ RESPONSE:"""
     def generate_response(self, prompt, return_only=False):
         """
         Generate response using Groq (fast inference).
-        If return_only=True, returns the response instead of printing.
         """
         try:
             response = groq_client.chat.completions.create(
@@ -206,24 +203,10 @@ RESPONSE:"""
             return response_text
 
         except Exception as e:
+            error_msg = f"Error generating response with Groq API: {str(e)}"
             if not return_only:
-                print(f"Error with Groq API: {e}")
-            # Fallback to OpenAI if available
-            if openai_client:
-                if not return_only:
-                    print("Falling back to OpenAI...")
-                response = openai_client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=TEMPERATURE,
-                    max_tokens=MAX_TOKENS
-                )
-                response_text = response.choices[0].message.content
-                if not return_only:
-                    print(response_text)
-                return response_text
-            else:
-                raise Exception("Both Groq and OpenAI failed. Please check your API keys.")
+                print(f"❌ {error_msg}")
+            raise Exception(error_msg + "\nPlease check your GROQ_API_KEY is set correctly in Secrets.")
 
     def chat(self, user_query, provider_filter=None):
         """

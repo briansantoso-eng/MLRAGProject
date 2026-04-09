@@ -1,0 +1,110 @@
+"""
+Configuration for the CloudDocs RAG system.
+Centralizes all settings, API keys, and hyperparameters.
+"""
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# API Keys
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Optional - for fallback
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+if not GROQ_API_KEY:
+    raise ValueError("Please set GROQ_API_KEY in your .env file (needed for LLM responses)")
+
+# Embedding Configuration (using free local model)
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"  # Free SentenceTransformer model
+EMBEDDING_DIMENSION = 384  # This model outputs 384-dimensional vectors
+
+# LLM Configuration (using Groq for fast inference)
+LLM_MODEL = "llama-3.1-8b-instant"  # Current Groq Llama model
+TEMPERATURE = 0.1  # Low temperature for factual answers
+MAX_TOKENS = 1000
+
+# Vector Database Configuration
+CHROMA_DB_PATH = "./chroma_db"
+COLLECTION_NAME = "cloud_docs"
+
+# Document Processing Configuration
+CHUNK_SIZE = 1000  # Characters per chunk
+CHUNK_OVERLAP = 200  # Overlap between chunks for context continuity
+
+# Retrieval Configuration
+TOP_K_RETRIEVAL = 5  # Number of chunks to retrieve
+SIMILARITY_THRESHOLD = 0.7  # Minimum similarity score for retrieval
+
+# Data Sources (AWS + Azure documentation pages)
+DATA_SOURCES = {
+    "aws": [
+        {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+            "title": "AWS Lambda",
+            "category": "compute"
+        },
+        {
+            "url": "https://docs.aws.amazon.com/s3/index.html",
+            "title": "Amazon S3",
+            "category": "storage"
+        },
+        {
+            "url": "https://docs.aws.amazon.com/ec2/index.html",
+            "title": "Amazon EC2",
+            "category": "compute"
+        },
+        {
+            "url": "https://docs.aws.amazon.com/rds/index.html",
+            "title": "Amazon RDS",
+            "category": "database"
+        },
+        {
+            "url": "https://docs.aws.amazon.com/iam/index.html",
+            "title": "AWS Identity and Access Management",
+            "category": "security"
+        },
+        {
+            "url": "https://docs.aws.amazon.com/vpc/index.html",
+            "title": "Amazon VPC",
+            "category": "networking"
+        }
+    ],
+    "azure": [
+        {
+            "url": "https://docs.microsoft.com/en-us/azure/virtual-machines/",
+            "title": "Azure Virtual Machines",
+            "category": "compute"
+        },
+        {
+            "url": "https://docs.microsoft.com/en-us/azure/storage/",
+            "title": "Azure Storage",
+            "category": "storage"
+        },
+        {
+            "url": "https://docs.microsoft.com/en-us/azure/sql-database/",
+            "title": "Azure SQL Database",
+            "category": "database"
+        },
+        {
+            "url": "https://docs.microsoft.com/en-us/azure/active-directory/",
+            "title": "Azure Active Directory",
+            "category": "security"
+        },
+        {
+            "url": "https://docs.microsoft.com/en-us/azure/virtual-network/",
+            "title": "Azure Virtual Network",
+            "category": "networking"
+        },
+        {
+            "url": "https://docs.microsoft.com/en-us/azure/functions/",
+            "title": "Azure Functions",
+            "category": "compute"
+        }
+    ]
+}
+
+# Chat Configuration
+MAX_CONVERSATION_HISTORY = 10  # Number of message pairs to keep in memory
+STREAMING_ENABLED = True  # Stream responses for better UX

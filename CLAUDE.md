@@ -1,0 +1,92 @@
+# CloudDocs RAG Project Memory
+
+## Project Overview
+This is a complete RAG (Retrieval-Augmented Generation) system built from scratch using real AWS and Azure cloud documentation. The goal is to teach every concept in modern RAG implementation while building something practical and cost-effective.
+
+## Tech Stack
+- **LLM**: Groq Llama 3 8B (fast inference, cost-effective)
+- **Embeddings**: SentenceTransformers all-MiniLM-L6-v2 (free, local)
+- **Vector DB**: ChromaDB with HNSW indexing
+- **Web Scraping**: BeautifulSoup4 + requests
+- **Config**: Python-dotenv for API keys
+
+## Architecture
+```
+Real AWS/Azure Docs → Web Scraping → HTML Cleaning → Sliding Window Chunking → OpenAI Embeddings → ChromaDB → Cosine Similarity Retrieval → GPT-4o-mini → Grounded Answers
+```
+
+## Key Features
+- **Cost-effective**: Total cost < $0.05 for complete system
+- **Educational**: Every concept explained with code examples
+- **Production-ready**: Error handling, streaming, conversation memory
+- **Extensible**: Easy to add more cloud providers or document sources
+
+## Learning Goals
+1. **Document Ingestion**: Web scraping, HTML parsing, text chunking
+2. **Vector Embeddings**: Text-to-vector conversion, similarity search
+3. **RAG Pipeline**: Retrieval + generation, prompt engineering
+4. **Interactive Chat**: Conversation memory, query rewriting, streaming
+
+## File Structure
+- `step1_ingest.py` - Fetch and chunk cloud documentation
+- `step2_embed_store.py` - Create embeddings and store in vector DB
+- `step3_rag_query.py` - Test RAG queries with cost tracking
+- `step4_chat.py` - Interactive chat with conversation memory
+- `config.py` - All settings and API configurations
+- `requirements.txt` - Python dependencies
+- `README.md` - Complete setup and usage guide
+- `CONCEPTS_GUIDE.md` - Deep dive into every RAG concept
+
+## Current Status
+✅ **Complete and tested**
+- All 4 steps implemented and working
+- Comprehensive documentation
+- Cost optimization verified
+- Error handling and edge cases covered
+
+## Usage Instructions
+```bash
+pip install -r requirements.txt
+cp .env.example .env  # Add OpenAI API key
+python step1_ingest.py      # Fetch docs (~2 min)
+python step2_embed_store.py # Embed chunks (~$0.001)
+python step3_rag_query.py   # Test queries
+python step4_chat.py        # Interactive chat
+```
+
+## Key Concepts Covered
+- Text embeddings and cosine similarity
+- Vector databases (ChromaDB, HNSW indexing)
+- Sliding window chunking with overlap
+- Retrieval-augmented generation
+- Prompt engineering for grounded responses
+- Token counting and cost estimation
+- Conversation memory and query rewriting
+- Streaming responses
+- Metadata filtering
+
+## Sample Queries
+- "How do I create a serverless function?"
+- "What are the differences between AWS Lambda and Azure Functions?"
+- "How do I store files in the cloud?"
+- "What are security best practices for cloud databases?"
+
+## Cost Breakdown
+- **Ingestion**: Free (web scraping)
+- **Embeddings**: Free (local SentenceTransformers)
+- **Queries**: ~$0.001 per question (Groq is much cheaper than OpenAI)
+- **Total**: <$0.05 for complete project
+
+## Future Extensions
+- Add GCP documentation
+- Implement hybrid search (keyword + vector)
+- Add web UI with Streamlit
+- Multi-modal support (diagrams, images)
+- Agentic capabilities with tool calling
+
+## Notes for Claude
+- This project uses real cloud documentation, not synthetic data
+- All concepts are explained in code comments and CONCEPTS_GUIDE.md
+- The system is designed to be educational first, optimized second
+- Cost is kept extremely low to be accessible to everyone
+- Each step builds on the previous one, teaching incrementally

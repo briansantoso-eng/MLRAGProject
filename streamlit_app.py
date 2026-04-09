@@ -6,12 +6,26 @@ import streamlit as st
 @st.cache_resource
 def initialize_knowledge_base():
     """Initialize the knowledge base if not already done."""
-    if not os.path.exists("chroma_db"):
-        st.info("⏳ Initializing knowledge base on first load (this may take 1-2 minutes)...")
-        os.system("python step1_ingest.py")
-        st.info("✅ Ingestion complete. Embedding documents...")
-        os.system("python step2_embed_store.py")
-        st.success("✅ Knowledge base ready!")
+    if not os.path.exists("chroma_db") or not os.path.exists("processed_documents.json"):
+        st.info("⏳ Initializing knowledge base on first load (this may take 2-3 minutes)...")
+        
+        try:
+            # Step 1: Ingest documents
+            st.info("📥 Fetching and processing cloud documentation...")
+            from step1_ingest import main as ingest_main
+            ingest_main()
+            st.success("✅ Ingestion complete")
+            
+            # Step 2: Embed and store
+            st.info("🔢 Creating embeddings and storing in vector database...")
+            from step2_embed_store import process_documents
+            process_documents()
+            st.success("✅ Knowledge base ready!")
+            
+        except Exception as e:
+            st.error(f"❌ Error initializing knowledge base: {e}")
+            st.error("Please try refreshing the page")
+            raise
 
 # Run initialization
 initialize_knowledge_base()
@@ -24,8 +38,10 @@ st.set_page_config(page_title="CloudDocs RAG Assistant", page_icon="☁️", lay
 if 'chat' not in st.session_state:
     try:
         st.session_state.chat = RAGChat(quiet=True)
+        st.session_state.chat_initialized = True
     except Exception as e:
-        st.error(f"Failed to initialize chat: {e}")
+        st.error(f"❌ Failed to initialize chat: {str(e)}")
+        st.error("Make sure your GROQ_API_KEY is set in Secrets")
         st.stop()
 
 if 'messages' not in st.session_state:

@@ -32,7 +32,7 @@ class RAGChat:
     pronouns like "it" or "that" in the context of prior questions.
     """
 
-    def __init__(self):
+    def __init__(self, quiet=False):
         # Initialize ChromaDB
         self.chroma_client = chromadb.PersistentClient(
             path=CHROMA_DB_PATH,
@@ -43,9 +43,10 @@ class RAGChat:
         # Conversation memory
         self.conversation_history = []
 
-        print("🤖 RAG Chat initialized!")
-        print("💡 Ask questions about AWS and Azure cloud services.")
-        print("🔄 Type 'quit' to exit, 'clear' to reset memory.\n")
+        if not quiet:
+            print("🤖 RAG Chat initialized!")
+            print("💡 Ask questions about AWS and Azure cloud services.")
+            print("🔄 Type 'quit' to exit, 'clear' to reset memory.\n")
 
     def rewrite_query(self, user_query):
         """
@@ -174,10 +175,10 @@ RESPONSE:"""
         if len(self.conversation_history) > MAX_CONVERSATION_HISTORY * 2:
             self.conversation_history = self.conversation_history[-MAX_CONVERSATION_HISTORY*2:]
 
-    def generate_response(self, prompt):
+    def generate_response(self, prompt, return_only=False):
         """
         Generate response using Groq (fast inference).
-        Note: Groq doesn't support token streaming like OpenAI.
+        If return_only=True, returns the response instead of printing.
         """
         try:
             response = groq_client.chat.completions.create(
@@ -188,7 +189,7 @@ RESPONSE:"""
             )
             response_text = response.choices[0].message.content
 
-            if STREAMING_ENABLED:
+            if not return_only and STREAMING_ENABLED:
                 # Simulate streaming by printing word by word
                 words = response_text.split()
                 for word in words:
@@ -196,16 +197,18 @@ RESPONSE:"""
                     import time
                     time.sleep(0.05)  # Small delay to simulate streaming
                 print()  # New line at end
-            else:
+            elif not return_only:
                 print(response_text)
 
             return response_text
 
         except Exception as e:
-            print(f"Error with Groq API: {e}")
+            if not return_only:
+                print(f"Error with Groq API: {e}")
             # Fallback to OpenAI if available
             if openai_client:
-                print("Falling back to OpenAI...")
+                if not return_only:
+                    print("Falling back to OpenAI...")
                 response = openai_client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[{"role": "user", "content": prompt}],
@@ -213,7 +216,8 @@ RESPONSE:"""
                     max_tokens=MAX_TOKENS
                 )
                 response_text = response.choices[0].message.content
-                print(response_text)
+                if not return_only:
+                    print(response_text)
                 return response_text
             else:
                 raise Exception("Both Groq and OpenAI failed. Please check your API keys.")
@@ -292,29 +296,45 @@ RESPONSE:"""
                 print(f"❌ Error: {e}")
                 continue
 
-def main():
-    """
-    Start the interactive RAG chat.
-    """
-    print("🚀 Starting CloudDocs RAG Chat")
-    print("=" * 50)
+    def get_response(self, user_query, provider_filter=None):
+        """
+        Get response for web interface (returns string instead of printing).
+        """
+        # Rewrite query for context
+        rewritten_query = self.rewrite_query(user_query)
 
-    # Check if database exists
-    try:
-        chroma_client = chromadb.PersistentClient(
-            path=CHROMA_DB_PATH,
-            settings=Settings(anonymized_telemetry=False)
-        )
-        collection = chroma_client.get_collection(name=COLLECTION_NAME)
-        count = collection.count()
-        print(f"📊 Knowledge base ready: {count} document chunks")
-    except:
-        print("❌ Error: Knowledge base not found. Run step1_ingest.py and step2_embed_store.py first.")
-        return
+        # Retrieve context
+        context_chunks = self.retrieve_context(rewritten_query, provider_filter)
 
-    # Start chat
-    chat = RAGChat()
-    chat.run_interactive_chat()
+        if not context_chunks:
+            response = "I don't have enough information in my knowledge base to answer that question. Could you try rephrasing it or asking about AWS/Azure/GCP cloud services?"
+            self.add_to_history("user", user_query)
+            self.add_to_history("assistant", response)
+            return response
 
-if __name__ == "__main__":
-    main()
+        # Build prompt
+        prompt = self.build_chat_prompt(user_query, context_chunks)
+
+        # Generate response
+        response = self.generate_response(prompt, return_only=True)
+
+        # Add source information
+        if context_chunks:
+            sources = []
+            for chunk in context_chunks[:3]:  # Show top 3 sources
+                metadata = chunk['metadata']
+                provider = metadata.get('provider', 'unknown').upper()
+                title = metadata.get('title', 'Unknown')
+                url = metadata.get('url', '#')
+                sources.append(f"- [{title}]({url}) ({provider})")
+
+            if sources:
+                response += "\n\n**📚 Sources:**\n" + "\n".join(sources)
+
+        # Add to history
+        self.add_to_history("user", user_query)
+        self.add_to_history("assistant", response)
+
+        return response
+
+    

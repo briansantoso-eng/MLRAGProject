@@ -374,5 +374,125 @@
     "expected_provider": null,
     "category": "cross-provider",
     "reference_answer": "Both offer tiered storage. S3 provides Standard-IA, Glacier, and Glacier Deep Archive for progressively cheaper storage with longer retrieval times. Azure Blob Storage offers Cool and Archive tiers. Both support lifecycle policies to automatically move data to cheaper tiers."
+  },
+  {
+    "id": "hard-biz-001",
+    "question": "We need a cheap and durable place to store millions of small customer photos that our web app serves to users globally.",
+    "expected_sources": ["Amazon S3", "Azure Storage", "GCP Storage"],
+    "expected_provider": null,
+    "category": "storage",
+    "reference_answer": "Object storage services are designed for this: Amazon S3, Azure Blob Storage, and GCP Cloud Storage. All offer high durability (eleven nines), low per-GB pricing, and native CDN integrations for fast global delivery."
+  },
+  {
+    "id": "hard-biz-002",
+    "question": "Our confirmation email handler runs for 200ms and fires about 50 times a day. We want to pay only when it actually executes, not for idle time.",
+    "expected_sources": ["AWS Lambda", "Azure Functions", "GCP Cloud Functions"],
+    "expected_provider": null,
+    "category": "compute",
+    "reference_answer": "Serverless function platforms charge only for execution time. Fifty 200ms invocations per day costs fractions of a cent on AWS Lambda, Azure Functions, or GCP Cloud Functions. No server is kept running between invocations."
+  },
+  {
+    "id": "hard-biz-003",
+    "question": "How do I make sure a developer can push code to production but cannot drop or modify the production database schema?",
+    "expected_sources": ["AWS Identity and Access Management", "Azure Active Directory", "GCP IAM"],
+    "expected_provider": null,
+    "category": "security",
+    "reference_answer": "IAM systems enforce the principle of least privilege. You grant the developer deployment permissions while withholding database DDL rights. Separate roles for deployment and database administration prevent accidental or unauthorized schema changes."
+  },
+  {
+    "id": "hard-biz-004",
+    "question": "My web servers need to serve internet traffic, but my database servers should have no inbound or outbound internet access at all.",
+    "expected_sources": ["Amazon VPC", "Azure Virtual Network", "GCP VPC"],
+    "expected_provider": null,
+    "category": "networking",
+    "reference_answer": "Place web servers in a public subnet (route to internet gateway) and database servers in a private subnet (no internet route). Security groups or firewall rules then restrict the database to accept connections only from the web tier's IP range."
+  },
+  {
+    "id": "hard-biz-005",
+    "question": "Our database becomes unavailable for several minutes every time AWS patches the underlying hardware. How do we eliminate that downtime?",
+    "expected_sources": ["Amazon RDS"],
+    "expected_provider": "aws",
+    "category": "database",
+    "reference_answer": "RDS Multi-AZ maintains a synchronous standby replica in a different availability zone. During maintenance or failure the primary fails over to the standby automatically, typically completing in under two minutes with no data loss."
+  },
+  {
+    "id": "hard-equiv-001",
+    "question": "What is Google Cloud's equivalent of an Amazon EC2 instance?",
+    "expected_sources": ["GCP Compute"],
+    "expected_provider": "gcp",
+    "category": "compute",
+    "reference_answer": "GCP Compute Engine is the equivalent of Amazon EC2. It provides virtual machine instances you can configure with your choice of OS, machine type, and attached storage, with full control over the software stack."
+  },
+  {
+    "id": "hard-equiv-002",
+    "question": "What does Microsoft Azure call its serverless code execution service, the equivalent of AWS Lambda?",
+    "expected_sources": ["Azure Functions"],
+    "expected_provider": "azure",
+    "category": "compute",
+    "reference_answer": "Azure Functions is Microsoft Azure's serverless equivalent of AWS Lambda. Both run event-driven code without managing infrastructure and charge only for execution time and resource consumption."
+  },
+  {
+    "id": "hard-equiv-003",
+    "question": "What is the AWS service for storing files and objects that is equivalent to Azure Blob Storage?",
+    "expected_sources": ["Amazon S3"],
+    "expected_provider": "aws",
+    "category": "storage",
+    "reference_answer": "Amazon S3 is equivalent to Azure Blob Storage. Both store unstructured data as objects. S3 uses buckets and objects; Azure uses storage accounts and blob containers. Both offer tiered pricing for infrequent access and archival."
+  },
+  {
+    "id": "hard-equiv-004",
+    "question": "What does AWS call its managed relational database service, the equivalent of Azure SQL Database?",
+    "expected_sources": ["Amazon RDS"],
+    "expected_provider": "aws",
+    "category": "database",
+    "reference_answer": "Amazon RDS (Relational Database Service) is the equivalent of Azure SQL Database. Both are managed services that handle patching, backups, and failover. RDS supports multiple engines including MySQL, PostgreSQL, and SQL Server."
+  },
+  {
+    "id": "hard-equiv-005",
+    "question": "What is the Azure service that plays the same role as AWS IAM for controlling who can access cloud resources?",
+    "expected_sources": ["Azure Active Directory"],
+    "expected_provider": "azure",
+    "category": "security",
+    "reference_answer": "Azure Active Directory combined with Azure RBAC serves the role of AWS IAM. Azure AD manages user identities and authentication while Azure RBAC defines what actions those identities can perform on Azure resources."
+  },
+  {
+    "id": "hard-failure-001",
+    "question": "My AWS Lambda function times out every time it tries to connect to my RDS database. The function works fine connecting to external APIs. What is likely misconfigured?",
+    "expected_sources": ["Amazon VPC"],
+    "expected_provider": "aws",
+    "category": "networking",
+    "reference_answer": "Lambda functions must be configured to run inside the same VPC as the RDS instance. Without VPC configuration Lambda runs in AWS-managed infrastructure with no access to private RDS instances. You also need a security group rule allowing Lambda's security group to reach the RDS port."
+  },
+  {
+    "id": "hard-failure-002",
+    "question": "We left our storage bucket publicly readable by accident and 10TB of data was downloaded overnight, costing us thousands of dollars. What controls should have been in place?",
+    "expected_sources": ["Amazon S3", "Azure Storage", "GCP Storage"],
+    "expected_provider": null,
+    "category": "storage",
+    "reference_answer": "Object storage services are private by default. S3 Block Public Access, Azure storage account network rules, and GCP uniform bucket-level access settings should be enabled to prevent accidental public exposure. Lifecycle policies and access logs help detect anomalies before they become costly."
+  },
+  {
+    "id": "hard-failure-003",
+    "question": "A junior developer deleted the production database because they had the same admin permissions as the database team. What access control change would have prevented this?",
+    "expected_sources": ["AWS Identity and Access Management", "Azure Active Directory", "GCP IAM"],
+    "expected_provider": null,
+    "category": "security",
+    "reference_answer": "The principle of least privilege: each identity gets only the minimum permissions required for their role. A developer role should include deployment and read access but exclude database deletion. Destructive operations should be restricted to a separate, tightly controlled admin role."
+  },
+  {
+    "id": "hard-term-001",
+    "question": "What is the difference between a bucket in AWS and a container in Azure when storing files in the cloud?",
+    "expected_sources": ["Amazon S3", "Azure Storage"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both are top-level namespaces for organizing objects. An S3 bucket is a globally unique resource for objects within a specific region. An Azure blob container is a logical grouping of blobs inside a storage account. Functionally equivalent but with different naming conventions and access control models."
+  },
+  {
+    "id": "hard-term-002",
+    "question": "What does GCP call the mechanism for defining which actions a service account is allowed to perform, similar to an AWS IAM policy?",
+    "expected_sources": ["GCP IAM"],
+    "expected_provider": "gcp",
+    "category": "security",
+    "reference_answer": "GCP IAM uses roles and IAM bindings. A role is a collection of permissions. An IAM binding attaches a member (user, service account, or group) to a role on a specific resource. This is the functional equivalent of an AWS IAM policy attached to a principal."
   }
 ]

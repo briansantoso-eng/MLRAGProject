@@ -79,40 +79,53 @@ Three metrics:
 - **MRR@K** — how highly was it ranked?
 - **Faithfulness** — does the answer stay grounded in what was retrieved? Scored 1-5 by a second LLM call acting as judge.
 
-### Eval set: explicit vs implicit questions
+### Eval set: three tiers of difficulty
 
-The initial 27 questions all named the service directly ("What is Amazon S3 and what kind of data can you store in it?"). These are too easy — a simple name-match is enough to retrieve the right document. They don't test whether the system can handle real-world queries.
+The eval set was built in three phases, each harder than the last:
 
-20 harder implicit questions were added that describe a use case without naming the service:
+| Tier | Count | Example | What it tests |
+| --- | --- | --- | --- |
+| **Explicit** | 27 q | "What is Amazon S3 and what kind of data can you store in it?" | Name-match retrieval — baseline only |
+| **Implicit** | 20 q | "In AWS, how do I run event-driven code without managing servers?" | Semantic retrieval: provider named, service not |
+| **Hard** | 15 q | "My Lambda function times out connecting to RDS — what is misconfigured?" | Business problems, cross-vocabulary, failure scenarios, no cloud terms |
 
-| Type | Example | Why it's harder |
+The hard tier includes:
+- **Business language** — no cloud terminology at all ("our database goes down during maintenance")
+- **Cross-vocabulary** — uses one provider's name to ask about another ("what is GCP's equivalent of EC2?")
+- **Failure scenarios** — describes a symptom, not a service ("Lambda times out connecting to RDS")
+- **Least-privilege security** — asks about access restrictions without naming IAM
+
+Final eval set: **62 questions** across all 6 categories.
+
+### Final results (fixed corpus + 62-question eval set)
+
+| Metric | Easy (27 q) | Implicit (47 q) | Hard (62 q) |
+| --- | --- | --- | --- |
+| Recall@3 | 1.000 | 1.000 | **0.919** |
+| MRR@3 | 1.000 | 0.922 | **0.812** |
+
+Recall dropped to 0.919 — 5 questions genuinely failed. MRR dropped to 0.812. These are honest production numbers.
+
+**The 5 misses and why:**
+
+| Question | Expected | Why retrieval failed |
 | --- | --- | --- |
-| Provider named, service implicit | "In AWS, how do I run event-driven code without managing servers?" | Must retrieve Lambda via semantics, not name-match |
-| No provider, no service | "How do I store large files durably and cheaply in the cloud?" | Must retrieve correct doc from all 18 without any filter signal |
-| Cross-provider implicit | "Compare how AWS and Google Cloud isolate network traffic between workloads" | Must retrieve correct docs from two providers without naming either service |
+| "Developer can deploy code but not drop the database schema" | IAM | No IAM keywords — purely describes a permissions design pattern |
+| "Web servers internet-facing, DB servers fully isolated" | VPC | Problem framing with no VPC/subnet terminology |
+| "What is the Azure equivalent of AWS IAM?" | Azure Active Directory | "plays the same role as" — indirect phrasing without identity keywords |
+| "Lambda times out connecting to RDS — what is misconfigured?" | Amazon VPC | Symptom-based — correct answer (Lambda needs VPC config) requires multi-hop reasoning |
+| "Junior developer deleted the DB — what access control was missing?" | IAM | Incident description, zero IAM terminology |
 
-Final eval set: **47 questions** across all 6 categories.
+All 5 misses fall in security or networking. Both categories use conceptual language — "least privilege", "isolation", "access control" — that the embedding model struggles to map to specific service chunks.
 
-### Final results (fixed corpus + 47-question eval set)
-
-| Metric | Easy set (27 q) | Production set (47 q) |
-| --- | --- | --- |
-| Recall@3 | 1.000 | 1.000 |
-| MRR@3 | 1.000 | **0.922** |
-| Faithfulness | — | 4.13 / 5 |
-
-MRR dropped from 1.000 to 0.922 — the harder questions are retrieved but not always ranked first. That is the honest number. Recall stays at 1.000 because the correct document is still found within k=3 even for implicit queries.
-
-| Category | Recall@3 | Faithfulness |
-| --- | --- | --- |
-| Compute | 100% | 4.2 / 5 |
-| Storage | 100% | 4.6 / 5 |
-| Database | 100% | 4.3 / 5 |
-| Networking | 100% | 4.3 / 5 |
-| Security | 100% | 3.7 / 5 |
-| Cross-provider | 100% | 3.6 / 5 |
-
-Security and cross-provider questions have lower faithfulness — these queries span multiple documents and the LLM sometimes adds context beyond what was retrieved.
+| Category | Recall@3 (62 q) |
+| --- | --- |
+| Compute | 100% (15/15) |
+| Storage | 100% (10/10) |
+| Database | 100% (8/8) |
+| Cross-provider | 100% (9/9) |
+| Networking | 78% (7/9) |
+| Security | 73% (8/11) |
 
 ### Baseline (before corpus fix)
 
@@ -211,9 +224,10 @@ Every AWS query retrieved Lambda because it was the only AWS document that exist
 | Baseline — broken corpus (27 easy q) | 0.630 | 0.611 |
 | Baseline — fixed corpus (27 easy q) | 1.000 | 0.975 |
 | Auto provider detection — fixed corpus (27 easy q) | 1.000 | 1.000 |
-| **Final — fixed corpus + 47 questions (20 implicit)** | **1.000** | **0.922** |
+| Fixed corpus + 47 questions (20 implicit) | 1.000 | 0.922 |
+| **Fixed corpus + 62 questions (35 implicit + hard)** | **0.919** | **0.812** |
 
-Recall went from 0.630 to 1.000 after the URL fix. MRR=1.000 on the easy set dropped to 0.922 on the harder 47-question set — a more honest measure of ranking quality.
+Recall dropped to 0.919 and MRR to 0.812 after adding the hardest questions — first time recall fell below 1.000. These are the honest production numbers.
 
 **Final corpus after balancing:** AWS 44, GCP 27, Azure 17 — capped at 8 chunks per document via `MAX_CHUNKS_PER_DOC` in config.
 
@@ -233,8 +247,9 @@ A full log of every error made during development — what was wrong, why it hap
 | 4 | AWS documentation URLs pointed to index pages | `docs.aws.amazon.com/s3/index.html` returns 21 chars (a JavaScript SPA shell). S3, EC2, RDS, IAM, VPC all had 0 chunks. Every AWS query retrieved Lambda because it was the only AWS doc that existed | Replaced all 5 broken URLs with direct content page URLs; corpus grew from 50 to 143 chunks |
 | 5 | `step2_embed_store.py` called `initialize_chroma()` twice | `main()` ran `process_documents()` (builds collection), then immediately called `initialize_chroma()` again which deleted and recreated the collection — wiping all data silently. Collection always showed 0 chunks after embed | Made `process_documents()` return the collection; `main()` reuses it instead of reinitializing |
 | 6 | Corpus imbalance after URL fix | S3 returned 41 chunks, RDS 25 — while Azure Storage had 2. AWS dominated 99/143 chunks, which would bias retrieval for ambiguous real-world queries | Added `MAX_CHUNKS_PER_DOC = 8` cap in config; corpus balanced to AWS 44, GCP 27, Azure 17 |
+| 7 | Eval set was too easy | All 27 original questions explicitly named the service ("What is Amazon S3..."). Recall=1.000 on this set is trivially achieved by name-matching — it doesn't test real retrieval quality | Added 35 harder questions: implicit use-case descriptions, business language, failure scenarios, cross-vocabulary queries. Recall dropped to 0.919 and MRR to 0.812 — the honest numbers |
 
-**The core lesson:** three retrieval algorithm experiments (BGE, BM25, provider detection) all failed because the data was broken, not the algorithms. Debugging retrieval quality problems by inspecting individual misses — not just aggregate metrics — is what revealed the root cause.
+**The core lesson:** three retrieval algorithm experiments (BGE, BM25, provider detection) all failed because the data was broken, not the algorithms. Debugging retrieval quality problems by inspecting individual misses — not just aggregate metrics — is what revealed the root cause. The eval set lesson is the same: if your test questions are easy, a perfect score tells you nothing.
 
 ---
 

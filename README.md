@@ -23,8 +23,8 @@ This project solves that by building a RAG system grounded in the actual docs. I
 | **Evaluation** | Recall@K — retrieval coverage |
 | | MRR@K — ranking quality |
 | | LLM-as-judge — automated answer quality scoring |
-| | Ground-truth eval set construction (27 labeled question/source pairs) |
-| **Hyperparameter tuning** | K-sweep — systematic search over retrieval depth |
+| | Eval set hardening — 3 tiers of difficulty (explicit → implicit → hard) to surface realistic failure modes |
+| **Hyperparameter tuning** | K-sweep — systematic search over retrieval depth (k=1,3,5,10) |
 | | Recall-faithfulness tradeoff analysis |
 | **Query understanding** | Query rewriting — pronoun resolution using conversation history |
 | | Provider disambiguation — diagnosing that retrieval failures stem from missing query intent, not model quality |
@@ -137,6 +137,20 @@ The heatmap makes the weakness immediately visible: everything is 100% through E
 | Cross-provider | 100% (9/9) | 3.8 / 5 |
 | Security | 73% (8/11) | 3.9 / 5 |
 
+### Why harder eval questions matter
+
+An eval set that's too easy doesn't tell you anything useful — it just confirms the plumbing works. The three difficulty tiers were designed to surface increasingly realistic failure modes:
+
+**Explicit questions** confirm basic retrieval: if "What is Amazon S3?" doesn't return the S3 doc, nothing is working. Recall=1.000 here is expected, not impressive. It's a sanity check.
+
+**Implicit questions** test whether the system does actual semantic retrieval or just name-matching. "In AWS, how do I host a static website from object storage?" contains the provider signal but not the service name — the system has to understand that object storage + static hosting = S3. Getting these right means the embeddings are capturing meaning, not just keywords.
+
+**Hard questions** simulate real users. Real users don't say "AWS IAM" — they say "a developer shouldn't be able to delete the production database." They don't say "Amazon VPC" — they describe the symptom: "my Lambda function times out connecting to RDS." These questions found 5 genuine failures, all in security and networking, that the easier tiers completely missed.
+
+**The production benefit:** a system that scores 1.000 on explicit questions but 0.919 on hard questions is telling you that 8% of real-world queries will fail silently — returning a plausible but wrong document, generating a confident but wrong answer. Knowing that in advance is what makes the difference between a demo and something you'd trust in production.
+
+---
+
 ### Baseline (before corpus fix)
 
 These numbers are from the original broken corpus, included here so the progression is traceable:
@@ -151,7 +165,26 @@ AWS-specific questions missed consistently because 5 of 6 AWS docs were broken S
 
 ---
 
+## Fine-tuning summary
+
+Every tuning decision made during development, in order:
+
+| # | What was tuned | Why | Outcome |
+| --- | --- | --- | --- |
+| 1 | K-sweep (k=1,3,5,10) | Didn't know the right number of retrieved chunks — too few misses information, too many adds noise | k=3 is optimal: recall plateaus there, faithfulness peaks, cost is lowest |
+| 2 | BGE embedding model swap | Believed a larger, retrieval-specific model would produce more discriminative embeddings | No change — cloud services are semantically equivalent across providers; no model can separate them by meaning alone |
+| 3 | BM25 hybrid search | Expected keyword frequency matching to recover exact service name matches that dense search missed | Hurt recall at k=3 (0.630 → 0.518) — cloud docs use identical vocabulary so BM25 scores every provider equally |
+| 4 | Automatic provider detection | Spotted pattern that all 10 misses were AWS queries retrieving Lambda — suspected cross-provider confusion | 100% detection accuracy (27/27) but recall unchanged — forced inspection of the real root cause |
+| 5 | Corpus URL fix | Detection experiment revealed 5 AWS URLs pointed to JS SPA pages returning 21 chars, not actual docs | Recall jumped 0.630 → 1.000 after re-scraping with working URLs (143 chunks vs 50) |
+| 6 | MAX_CHUNKS_PER_DOC cap | After URL fix, S3 had 41 chunks vs Azure Storage's 2 — imbalance would bias retrieval toward AWS | Balanced corpus: AWS 44, GCP 27, Azure 17 chunks |
+| 7 | Implicit eval questions (+20) | All 27 original questions named the service directly — Recall=1.000 was trivially achieved by name-matching, not semantics | MRR dropped 1.000 → 0.922 — harder ranking challenge with no recall loss |
+| 8 | Hard eval questions (+15) | Implicit questions still had provider signals; real users describe problems without cloud terminology | Recall dropped to 0.919, MRR to 0.812 — first genuine retrieval failures, in security and networking |
+
+---
+
 ## Finding the optimal K
+
+**Why this was done:** K is the single most important retrieval hyperparameter — it controls how much context the LLM sees. There was no principled reason to start at k=5, so a sweep was run to find the actual optimum rather than guessing.
 
 K controls how many retrieved passages get passed to the LLM. Too few and you miss relevant information. Too many and you flood the context with noise — and pay more per query.
 
@@ -172,9 +205,11 @@ Recall plateaus completely at K=3. Going higher adds zero retrieval gain while f
 
 ## Retrieval improvement experiments
 
-Two approaches were tested to push Recall@K beyond 0.630.
+Recall was stuck at 0.630 after the K-sweep. Three more experiments were run in sequence, each motivated by a hypothesis about why retrieval was failing.
 
 ### Experiment 1: Stronger embedding model (BGE)
+
+**Why:** The working theory was that `all-MiniLM-L6-v2` (22M parameters, general-purpose) was encoding cloud service descriptions too loosely — S3 and GCP Storage landing close together in vector space because the model wasn't trained specifically for retrieval. A 5x larger model trained on retrieval tasks should produce tighter, more discriminative embeddings.
 
 Hypothesis: `all-MiniLM-L6-v2` is a small general-purpose model. Swapping to `BAAI/bge-base-en-v1.5` (5x larger, trained specifically for retrieval) should produce more discriminative embeddings.
 
@@ -191,6 +226,8 @@ The bottleneck is not model quality. S3 and GCP Storage genuinely are semantical
 
 ### Experiment 2: Hybrid search (BM25 + Dense via RRF)
 
+**Why:** If the embedding model was not the bottleneck, maybe the retrieval method was. BM25 ignores meaning entirely — it scores based on raw token frequency. A query containing "S3" should boost Amazon S3 above GCP Storage purely because the token "S3" appears more in S3 docs. Combining it with dense retrieval via Reciprocal Rank Fusion (RRF) should get the best of both worlds: semantic match from dense vectors and keyword precision from BM25.
+
 Hypothesis: BM25 scores on exact token frequency, not semantics. A query containing "S3" should give "Amazon S3" a high BM25 score regardless of how similar GCP Storage is in meaning. Combining BM25 with dense retrieval via Reciprocal Rank Fusion should recover keyword matches that dense search misses.
 
 **Result: BM25 made things worse.**
@@ -205,6 +242,8 @@ At k=3 recall dropped from 0.630 to 0.518. At k=5 recall matched but MRR fell �
 ![Hybrid Search Chart](eval/hybrid_search_chart.png)
 
 ### Experiment 3: Automatic provider detection
+
+**Why:** After two failed algorithm experiments, the miss pattern was inspected directly instead of trying another algorithm. Every one of the 10 failing questions was an AWS query, and every one of them retrieved Lambda as the top result. The hypothesis shifted: this wasn't a retrieval algorithm problem — it was a query scope problem. The system had no way to know a user asking about S3 didn't also want GCP Storage results. Adding provider detection to scope retrieval would eliminate cross-provider noise without changing the algorithm at all.
 
 After the first two experiments failed, inspecting the actual misses revealed a pattern: all 10 failing questions were AWS queries, and every one of them retrieved "AWS Lambda" as the top result instead of the correct service. This suggested the problem was cross-provider confusion — Lambda vs GCP Storage, for example.
 

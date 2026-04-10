@@ -12,6 +12,27 @@ This project solves that by building a RAG system grounded in the actual docs. I
 
 ---
 
+## NLP Techniques
+
+| Category | Technique |
+| --- | --- |
+| **Retrieval** | Dense vector search (cosine similarity) |
+| | BM25 keyword retrieval (term frequency scoring) |
+| | Hybrid search with Reciprocal Rank Fusion (RRF) |
+| **Embedding models** | Bi-encoder comparison: MiniLM vs BGE (model size vs retrieval quality) |
+| **Evaluation** | Recall@K — retrieval coverage |
+| | MRR@K — ranking quality |
+| | LLM-as-judge — automated answer quality scoring |
+| | Ground-truth eval set construction (27 labeled question/source pairs) |
+| **Hyperparameter tuning** | K-sweep — systematic search over retrieval depth |
+| | Recall-faithfulness tradeoff analysis |
+| **Query understanding** | Query rewriting — pronoun resolution using conversation history |
+| | Provider disambiguation — diagnosing that retrieval failures stem from missing query intent, not model quality |
+
+**Key insight from experiments:** when two retrieval approaches both fail, the problem is usually in the data structure or query understanding — not the algorithm. Dense search and BM25 both struggled for the same reason: cloud docs from different providers describe the same concepts using identical words. No retrieval algorithm can distinguish them without knowing which provider the user is asking about.
+
+---
+
 ## Branch guide
 
 Each branch in this repo represents a distinct stage of the ML development process:

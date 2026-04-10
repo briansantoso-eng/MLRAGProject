@@ -16,7 +16,19 @@ This project solves that by building a RAG system grounded in the actual docs. I
 
 Real cloud docs are fetched, chunked into overlapping passages, and embedded locally using SentenceTransformers. At query time, the question is embedded the same way, and ChromaDB retrieves the closest matching passages. Those passages — not the model's prior knowledge — form the basis of the answer, generated via Groq Llama 3 8B.
 
-**Stack:** Groq Llama 3 8B · SentenceTransformers all-MiniLM-L6-v2 (local, free) · ChromaDB
+**ML Techniques Used:**
+
+| Layer | Tool / Technique |
+| --- | --- |
+| Text segmentation | Sliding window chunking (1000 chars, 200 overlap) with sentence boundary detection |
+| Embeddings | SentenceTransformers `all-MiniLM-L6-v2` — 384-dim dense vectors, local and free |
+| Vector search | ChromaDB with HNSW indexing, cosine similarity |
+| LLM inference | Groq Llama 3.1 8B Instant — low temperature (0.1) for factual answers |
+| Query rewriting | Pronoun resolution using conversation history before retrieval |
+| Retrieval eval | Recall@K, MRR@K (Mean Reciprocal Rank) |
+| Answer eval | LLM-as-judge faithfulness scoring (1–5) |
+| Hyperparameter tuning | K-sweep across k=1,3,5,10 to find optimal retrieval size |
+| Throughput | Parallel fetching (`ThreadPoolExecutor`), batch encoding (`batch_size=64`), singleton caching |
 
 ---
 

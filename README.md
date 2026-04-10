@@ -124,6 +124,10 @@ Recall dropped to 0.919 — 5 questions genuinely failed. MRR dropped to 0.812. 
 
 All 5 misses fall in security or networking. Both categories use conceptual language — "least privilege", "isolation", "access control" — that the embedding model struggles to map to specific service chunks.
 
+![Category Chart](eval/category_chart.png)
+
+The heatmap makes the weakness immediately visible: everything is 100% through Explicit and Implicit tiers, then Networking drops to 0% and Security to 25% on Hard questions. The faithfulness bars confirm the same pattern — when retrieval fails, it tends to fail on these two categories.
+
 | Category | Recall@3 | Faithfulness |
 | --- | --- | --- |
 | Compute | 100% (15/15) | 4.4 / 5 |

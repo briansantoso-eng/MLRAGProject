@@ -191,6 +191,19 @@ Recall=1.000 looked perfect — but every one of the 27 questions explicitly nam
 
 ---
 
+## Time spent
+
+Built across 2 days, ~9 hours total.
+
+| Session | Date | Duration | What was done |
+| --- | --- | --- | --- |
+| 1 | Apr 9 | 2h 37m | RAG pipeline (ingest, embed, query, chat), GCP docs, Streamlit app, live deployment |
+| 2 | Apr 10 | 6h 37m | Eval framework, K-sweep, 3 retrieval experiments, corpus fix, eval hardening, charts, docs |
+
+~3h 20m of that was experiment runtime (K-sweep at k=1/3/5/10, faithfulness eval over 62 questions hitting Groq rate limits). Active coding time: ~5h 54m.
+
+---
+
 ## Branch guide
 
 | Branch | What it covers |
@@ -200,6 +213,7 @@ Recall=1.000 looked perfect — but every one of the 27 questions explicitly nam
 | `ML-fine-tuning` | K-sweep across k=1,3,5,10 |
 | `ML-fine-tuning-hybrid-search-embedding-model` | BGE embedding swap and BM25 hybrid — both tested honestly |
 | `automatic-provider-detection` | Provider classifier (100% accurate), corpus URL fix, eval hardening |
+| `harder-evals-model-improvement` | Expanding the eval set with harder implicit and real-world questions to expose genuine retrieval failures and drive further model improvement |
 
 ---
 

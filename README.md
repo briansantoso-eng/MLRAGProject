@@ -79,6 +79,10 @@ Three metrics:
 - **MRR@K** — how highly was it ranked?
 - **Faithfulness** — does the answer stay grounded in what was retrieved? Scored 1-5 by a second LLM call acting as judge.
 
+The chart below shows every tuning experiment and every eval difficulty tier in a single view, ordered from the starting point to the final honest numbers:
+
+![Progression Chart](eval/progression_chart.png)
+
 ### Eval set: three tiers of difficulty
 
 The eval set was built in three phases, each harder than the last:

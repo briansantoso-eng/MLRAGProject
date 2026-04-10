@@ -23,7 +23,7 @@ Real cloud docs are fetched, chunked into overlapping passages, and embedded loc
 | Text segmentation | Sliding window chunking (1000 chars, 200 overlap) with sentence boundary detection |
 | Embeddings | SentenceTransformers `all-MiniLM-L6-v2` — 384-dim dense vectors, local and free |
 | Vector search | ChromaDB with HNSW indexing, cosine similarity |
-| LLM inference | Groq Llama 3.1 8B Instant — low temperature (0.1) for factual answers |
+| LLM inference | Groq Llama 3.1 8B Instant — low temperature (0.1) for factual answers. Groq used for its free tier; GPT-4o would be the production choice with funding. |
 | Query rewriting | Pronoun resolution using conversation history before retrieval |
 | Retrieval eval | Recall@K, MRR@K (Mean Reciprocal Rank) |
 | Answer eval | LLM-as-judge faithfulness scoring (1–5) |

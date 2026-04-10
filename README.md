@@ -172,9 +172,21 @@ A keyword-based provider classifier was built (`provider_detector.py`) and integ
 
 ### What all three experiments revealed
 
-Inspecting the misses after experiment 3 showed the real root cause: all 10 AWS misses retrieve "AWS Lambda" as the top result — even when filtered to AWS-only docs. Lambda is over-represented or better-scraped than S3, EC2, RDS, IAM, and VPC. Its chunks match the general query patterns for every AWS question, drowning out the correct service.
+After experiment 3, inspecting the miss pattern revealed the real root cause: **5 out of 6 AWS documentation URLs were broken**. The original URLs pointed to JavaScript-rendered index pages (`docs.aws.amazon.com/s3/index.html`) that return only 21 characters of content. Amazon S3, EC2, RDS, IAM, and VPC had 0 chunks in the index — only Lambda was successfully scraped.
 
-The problem is not cross-provider confusion. It is not model size. It is not keyword matching. It is **corpus imbalance** — one document dominates retrieval within its provider. The correct fix is to re-scrape the underperforming AWS services with more thorough coverage, or to cap how many chunks from a single source can appear in top-K results.
+Every AWS query retrieved Lambda because it was the only AWS document that existed. All previous experiments (BGE, BM25, provider detection) showed no improvement because they were running against a broken corpus.
+
+**Fix:** replaced all 5 broken URLs with direct content page URLs pointing to the actual documentation. After re-scraping (143 chunks vs 50 before) and re-embedding:
+
+| Method | Recall@3 | MRR@3 |
+| --- | --- | --- |
+| Baseline — broken corpus | 0.630 | 0.611 |
+| Baseline — fixed corpus | 1.000 | 0.975 |
+| Auto provider detection — fixed corpus | **1.000** | **1.000** |
+
+Recall went from 0.630 to 1.000. Auto provider detection pushed MRR to a perfect 1.000 — the correct document is now always ranked first.
+
+![Provider Detection Chart](eval/provider_detection_chart.png)
 
 ---
 

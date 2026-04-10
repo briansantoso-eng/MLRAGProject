@@ -71,7 +71,7 @@ Groq is used for its free tier. GPT-4o would be the production choice with fundi
 
 ## Measuring whether it actually works
 
-Saying "it seems to work" isn't enough. A 27-question ground-truth eval set was built across all three providers and six categories (compute, storage, database, security, networking, cross-provider). Each question has a known expected source, so retrieval quality can be scored automatically.
+Saying "it seems to work" isn't enough. A ground-truth eval set was built across all three providers and six categories (compute, storage, database, security, networking, cross-provider). Each question has a known expected source, so retrieval quality can be scored automatically.
 
 Three metrics:
 
@@ -79,7 +79,44 @@ Three metrics:
 - **MRR@K** — how highly was it ranked?
 - **Faithfulness** — does the answer stay grounded in what was retrieved? Scored 1-5 by a second LLM call acting as judge.
 
-Baseline at K=5:
+### Eval set: explicit vs implicit questions
+
+The initial 27 questions all named the service directly ("What is Amazon S3 and what kind of data can you store in it?"). These are too easy — a simple name-match is enough to retrieve the right document. They don't test whether the system can handle real-world queries.
+
+20 harder implicit questions were added that describe a use case without naming the service:
+
+| Type | Example | Why it's harder |
+| --- | --- | --- |
+| Provider named, service implicit | "In AWS, how do I run event-driven code without managing servers?" | Must retrieve Lambda via semantics, not name-match |
+| No provider, no service | "How do I store large files durably and cheaply in the cloud?" | Must retrieve correct doc from all 18 without any filter signal |
+| Cross-provider implicit | "Compare how AWS and Google Cloud isolate network traffic between workloads" | Must retrieve correct docs from two providers without naming either service |
+
+Final eval set: **47 questions** across all 6 categories.
+
+### Final results (fixed corpus + 47-question eval set)
+
+| Metric | Easy set (27 q) | Production set (47 q) |
+| --- | --- | --- |
+| Recall@3 | 1.000 | 1.000 |
+| MRR@3 | 1.000 | **0.922** |
+| Faithfulness | — | 4.13 / 5 |
+
+MRR dropped from 1.000 to 0.922 — the harder questions are retrieved but not always ranked first. That is the honest number. Recall stays at 1.000 because the correct document is still found within k=3 even for implicit queries.
+
+| Category | Recall@3 | Faithfulness |
+| --- | --- | --- |
+| Compute | 100% | 4.2 / 5 |
+| Storage | 100% | 4.6 / 5 |
+| Database | 100% | 4.3 / 5 |
+| Networking | 100% | 4.3 / 5 |
+| Security | 100% | 3.7 / 5 |
+| Cross-provider | 100% | 3.6 / 5 |
+
+Security and cross-provider questions have lower faithfulness — these queries span multiple documents and the LLM sometimes adds context beyond what was retrieved.
+
+### Baseline (before corpus fix)
+
+These numbers are from the original broken corpus, included here so the progression is traceable:
 
 | Metric | Score |
 | --- | --- |
@@ -87,16 +124,7 @@ Baseline at K=5:
 | MRR@5 | 0.61 |
 | Faithfulness | 3.7 / 5 |
 
-| Category | Recall@5 | Faithfulness |
-| --- | --- | --- |
-| Compute | 75% | 4.0 / 5 |
-| Cross-provider | 100% | 4.3 / 5 |
-| Storage | 50% | 2.8 / 5 |
-| Database | 50% | 2.8 / 5 |
-| Security | 50% | 4.0 / 5 |
-| Networking | 50% | 4.3 / 5 |
-
-Cross-provider questions ("compare Lambda vs Azure Functions") hit 100% recall — either doc satisfies the match. AWS-specific questions miss more often because the embedding model treats S3, GCP Storage, and Azure Blob as near-identical vectors. The model doesn't know they belong to different providers, only that they're semantically similar.
+AWS-specific questions missed consistently because 5 of 6 AWS docs were broken SPA pages returning 21 characters. Every AWS query retrieved Lambda because it was the only AWS document that existed.
 
 ---
 
@@ -180,13 +208,14 @@ Every AWS query retrieved Lambda because it was the only AWS document that exist
 
 | Method | Recall@3 | MRR@3 |
 | --- | --- | --- |
-| Baseline — broken corpus | 0.630 | 0.611 |
-| Baseline — fixed corpus | 1.000 | 0.975 |
-| Auto provider detection — fixed corpus | **1.000** | **1.000** |
+| Baseline — broken corpus (27 easy q) | 0.630 | 0.611 |
+| Baseline — fixed corpus (27 easy q) | 1.000 | 0.975 |
+| Auto provider detection — fixed corpus (27 easy q) | 1.000 | 1.000 |
+| **Final — fixed corpus + 47 questions (20 implicit)** | **1.000** | **0.922** |
 
-Recall went from 0.630 to 1.000. Auto provider detection pushed MRR from 0.975 to 1.000 — the correct document is now always ranked first.
+Recall went from 0.630 to 1.000 after the URL fix. MRR=1.000 on the easy set dropped to 0.922 on the harder 47-question set — a more honest measure of ranking quality.
 
-**Final corpus after balancing:** AWS 44, GCP 27, Azure 17 — capped at 8 chunks per document via `MAX_CHUNKS_PER_DOC` in config. Final eval: Recall@3 = 1.000, MRR@3 = 1.000.
+**Final corpus after balancing:** AWS 44, GCP 27, Azure 17 — capped at 8 chunks per document via `MAX_CHUNKS_PER_DOC` in config.
 
 ![Provider Detection Chart](eval/provider_detection_chart.png)
 

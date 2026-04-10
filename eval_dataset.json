@@ -214,5 +214,165 @@
     "expected_provider": null,
     "category": "cross-provider",
     "reference_answer": "AWS IAM focuses on controlling access to AWS resources through policies attached to users, groups, and roles. Azure AD is primarily an identity provider with SSO and MFA capabilities, complemented by Azure RBAC for resource access control."
+  },
+  {
+    "id": "implicit-aws-compute-1",
+    "question": "In AWS, how do I run event-driven code in response to a file upload without managing any servers?",
+    "expected_sources": ["AWS Lambda"],
+    "expected_provider": "aws",
+    "category": "compute",
+    "reference_answer": "AWS Lambda lets you run code triggered by events such as S3 file uploads. You write a function handler and Lambda automatically provisions compute, scales on demand, and charges only for execution time."
+  },
+  {
+    "id": "implicit-aws-storage-1",
+    "question": "In AWS, how do I host a static website directly from object storage?",
+    "expected_sources": ["Amazon S3"],
+    "expected_provider": "aws",
+    "category": "storage",
+    "reference_answer": "Amazon S3 supports static website hosting. You enable it on a bucket, upload HTML/CSS/JS files, and S3 serves them publicly. You can configure a custom domain via Route 53 and add a CDN via CloudFront."
+  },
+  {
+    "id": "implicit-aws-security-1",
+    "question": "In AWS, how do I grant one service permission to call another service without storing credentials in code?",
+    "expected_sources": ["AWS Identity and Access Management"],
+    "expected_provider": "aws",
+    "category": "security",
+    "reference_answer": "You create an IAM role with the required permissions and attach it to the calling service (e.g., an EC2 instance or Lambda function). AWS automatically rotates temporary credentials, eliminating the need to store long-term keys."
+  },
+  {
+    "id": "implicit-aws-networking-1",
+    "question": "In AWS, how do I make sure my database server is not directly reachable from the internet?",
+    "expected_sources": ["Amazon VPC"],
+    "expected_provider": "aws",
+    "category": "networking",
+    "reference_answer": "Place the database in a private subnet within a VPC. Private subnets have no route to an internet gateway, so the database is only reachable from other resources inside the same VPC."
+  },
+  {
+    "id": "implicit-azure-compute-1",
+    "question": "In Azure, how do I run code triggered by an HTTP request without provisioning or managing a server?",
+    "expected_sources": ["Azure Functions"],
+    "expected_provider": "azure",
+    "category": "compute",
+    "reference_answer": "Azure Functions with an HTTP trigger lets you deploy a function that responds to HTTP requests. On the consumption plan you pay only per execution and Azure handles all infrastructure."
+  },
+  {
+    "id": "implicit-azure-security-1",
+    "question": "In Azure, how do I enforce two-factor authentication for all users in my organization?",
+    "expected_sources": ["Azure Active Directory"],
+    "expected_provider": "azure",
+    "category": "security",
+    "reference_answer": "Azure Active Directory Conditional Access policies can require multi-factor authentication for all users. MFA prompts users for a second verification factor such as an authenticator app or SMS code before granting access."
+  },
+  {
+    "id": "implicit-gcp-database-1",
+    "question": "In Google Cloud, what managed service should I use if I need to run a MySQL or PostgreSQL database?",
+    "expected_sources": ["GCP Cloud SQL"],
+    "expected_provider": "gcp",
+    "category": "database",
+    "reference_answer": "GCP Cloud SQL is a fully managed relational database service that supports MySQL, PostgreSQL, and SQL Server. Google handles patching, backups, replication, and failover automatically."
+  },
+  {
+    "id": "implicit-gcp-networking-1",
+    "question": "In Google Cloud, how do I create an isolated private network for my resources?",
+    "expected_sources": ["GCP VPC"],
+    "expected_provider": "gcp",
+    "category": "networking",
+    "reference_answer": "GCP Virtual Private Cloud (VPC) provides a private network for your Google Cloud resources. You define subnets by region, control firewall rules, and can connect to on-premises networks via Cloud VPN or Interconnect."
+  },
+  {
+    "id": "implicit-any-vm-1",
+    "question": "How do I rent a virtual machine in the cloud where I have full control over the operating system?",
+    "expected_sources": ["Amazon EC2", "Azure Virtual Machines", "GCP Compute"],
+    "expected_provider": null,
+    "category": "compute",
+    "reference_answer": "All major cloud providers offer virtual machine services: Amazon EC2 (AWS), Azure Virtual Machines, and GCP Compute Engine. Each lets you choose an OS image, instance type, and manage the full software stack."
+  },
+  {
+    "id": "implicit-any-serverless-1",
+    "question": "What is the cheapest way to run short background tasks without paying for idle server time?",
+    "expected_sources": ["AWS Lambda", "Azure Functions", "GCP Cloud Functions"],
+    "expected_provider": null,
+    "category": "compute",
+    "reference_answer": "Serverless function platforms (AWS Lambda, Azure Functions, GCP Cloud Functions) charge only for actual execution time with no cost when idle. They are ideal for infrequent or unpredictable short-duration workloads."
+  },
+  {
+    "id": "implicit-any-object-storage-1",
+    "question": "How do I store large files like images and videos durably and cheaply in the cloud?",
+    "expected_sources": ["Amazon S3", "Azure Storage", "GCP Storage"],
+    "expected_provider": null,
+    "category": "storage",
+    "reference_answer": "Object storage services (Amazon S3, Azure Blob Storage, GCP Cloud Storage) are designed for large unstructured files. They offer high durability, global availability, and tiered pricing for infrequently accessed data."
+  },
+  {
+    "id": "implicit-any-db-failover-1",
+    "question": "How do I set up automatic failover so my relational database keeps serving traffic if one availability zone fails?",
+    "expected_sources": ["Amazon RDS", "Azure SQL Database", "GCP Cloud SQL"],
+    "expected_provider": null,
+    "category": "database",
+    "reference_answer": "Managed database services support high availability across zones. RDS Multi-AZ, Azure SQL geo-redundancy, and GCP Cloud SQL HA configuration each maintain a standby replica that is promoted automatically on failure."
+  },
+  {
+    "id": "implicit-any-iam-1",
+    "question": "How do I control which users and services are allowed to access specific cloud resources?",
+    "expected_sources": ["AWS Identity and Access Management", "Azure Active Directory", "GCP IAM"],
+    "expected_provider": null,
+    "category": "security",
+    "reference_answer": "Cloud IAM systems (AWS IAM, Azure AD with RBAC, GCP IAM) let you define who can perform which actions on which resources. Permissions are attached to identities through policies or roles."
+  },
+  {
+    "id": "implicit-any-private-network-1",
+    "question": "How do I connect my cloud environment to my office network so internal traffic never crosses the public internet?",
+    "expected_sources": ["Amazon VPC", "Azure Virtual Network", "GCP VPC"],
+    "expected_provider": null,
+    "category": "networking",
+    "reference_answer": "All major clouds offer private networking: AWS VPC with Direct Connect, Azure Virtual Network with ExpressRoute, and GCP VPC with Dedicated Interconnect. These establish private connections from your on-premises network to cloud resources."
+  },
+  {
+    "id": "implicit-any-cold-storage-1",
+    "question": "How do I archive old application logs to reduce storage costs while keeping them recoverable?",
+    "expected_sources": ["Amazon S3", "Azure Storage", "GCP Storage"],
+    "expected_provider": null,
+    "category": "storage",
+    "reference_answer": "Object storage tiering handles log archiving cost-effectively. S3 Glacier, Azure Archive tier, and GCP Nearline/Coldline each reduce storage costs for infrequently accessed data, with retrieval times ranging from minutes to hours."
+  },
+  {
+    "id": "implicit-cross-serverless-1",
+    "question": "Which has better support for running serverless event-driven workloads — AWS or Azure?",
+    "expected_sources": ["AWS Lambda", "Azure Functions"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both AWS Lambda and Azure Functions are mature serverless platforms. Lambda has a broader trigger ecosystem tied to AWS services. Azure Functions offers deeper integration with Azure Event Hubs and Logic Apps. Both auto-scale and charge per execution."
+  },
+  {
+    "id": "implicit-cross-networking-1",
+    "question": "Compare how AWS and Google Cloud isolate and segment network traffic between workloads.",
+    "expected_sources": ["Amazon VPC", "GCP VPC"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both use Virtual Private Cloud models. AWS VPC is region-scoped with subnets per availability zone and uses security groups and NACLs. GCP VPC is global by default with regional subnets and uses firewall rules applied at the network level."
+  },
+  {
+    "id": "implicit-cross-database-1",
+    "question": "How do the managed database services in AWS and Azure handle backups and point-in-time recovery?",
+    "expected_sources": ["Amazon RDS", "Azure SQL Database"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both RDS and Azure SQL Database perform automated backups and support point-in-time restore. RDS backs up to S3 with a configurable retention period. Azure SQL Database uses geo-redundant backup storage with up to 35 days retention."
+  },
+  {
+    "id": "implicit-cross-identity-1",
+    "question": "How do the identity and access management approaches differ between Google Cloud and Microsoft Azure?",
+    "expected_sources": ["GCP IAM", "Azure Active Directory"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "GCP IAM uses resource-level policies binding members to roles with fine-grained permissions. Azure uses Azure AD for identity management combined with Azure RBAC for resource authorization. Azure AD also handles enterprise SSO and MFA at the organizational level."
+  },
+  {
+    "id": "implicit-cross-storage-cost-1",
+    "question": "How do AWS and Azure handle cost optimization for storing data that is rarely accessed?",
+    "expected_sources": ["Amazon S3", "Azure Storage"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both offer tiered storage. S3 provides Standard-IA, Glacier, and Glacier Deep Archive for progressively cheaper storage with longer retrieval times. Azure Blob Storage offers Cool and Archive tiers. Both support lifecycle policies to automatically move data to cheaper tiers."
   }
 ]

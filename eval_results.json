@@ -1,34 +1,34 @@
 {
   "summary": {
     "n": 27,
-    "recall_at_5": 0.6296,
-    "mrr_at_5": 0.6111,
-    "avg_faithfulness": 3.7
+    "recall_at_3": 1.0,
+    "mrr_at_3": 0.9753,
+    "avg_faithfulness": null
   },
   "per_category": {
     "compute": {
-      "recall": 0.75,
-      "avg_faithfulness": 4.0
+      "recall": 1.0,
+      "avg_faithfulness": null
     },
     "storage": {
-      "recall": 0.5,
-      "avg_faithfulness": 2.75
+      "recall": 1.0,
+      "avg_faithfulness": null
     },
     "database": {
-      "recall": 0.5,
-      "avg_faithfulness": 2.75
+      "recall": 1.0,
+      "avg_faithfulness": null
     },
     "security": {
-      "recall": 0.5,
-      "avg_faithfulness": 4.0
+      "recall": 1.0,
+      "avg_faithfulness": null
     },
     "networking": {
-      "recall": 0.5,
-      "avg_faithfulness": 4.25
+      "recall": 1.0,
+      "avg_faithfulness": null
     },
     "cross-provider": {
       "recall": 1.0,
-      "avg_faithfulness": 4.33
+      "avg_faithfulness": null
     }
   },
   "results": [
@@ -42,14 +42,10 @@
       "retrieved_titles": [
         "AWS Lambda",
         "AWS Lambda",
-        "AWS Lambda",
-        "AWS Lambda",
         "AWS Lambda"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "AWS Lambda is a compute service that runs code without the need to manage servers. It is used for various tasks such as file processing, long-running workflows, database operations, scheduled tasks, stream processing, web applications, mobile backends, and IoT backends.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "aws-lambda-2",
@@ -61,14 +57,10 @@
       "retrieved_titles": [
         "AWS Lambda",
         "AWS Lambda",
-        "AWS Lambda",
-        "AWS Lambda",
         "AWS Lambda"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "AWS Lambda scales automatically, with capacity provisioning and automatic scaling managed by the service.",
-      "faithfulness": 5
+      "rank": 1
     },
     {
       "id": "aws-s3-1",
@@ -78,16 +70,12 @@
         "Amazon S3"
       ],
       "retrieved_titles": [
-        "GCP Storage",
-        "AWS Lambda",
-        "Azure Storage",
-        "AWS Lambda",
-        "GCP Storage"
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "Amazon S3 is not mentioned in the provided context. However, it is mentioned that you can use Cloud Storage for a range of scenarios including storing data for archival and disaster recovery, or distributing content to consumers across the globe.",
-      "faithfulness": 3
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-s3-2",
@@ -97,16 +85,12 @@
         "Amazon S3"
       ],
       "retrieved_titles": [
-        "Azure Storage",
-        "GCP Storage",
-        "GCP Storage",
-        "Azure Virtual Machines",
-        "AWS Lambda"
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "There is no information about S3 storage classes in the provided context. The context only discusses Azure Storage and Google Cloud Storage.",
-      "faithfulness": 1
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-ec2-1",
@@ -116,16 +100,12 @@
         "Amazon EC2"
       ],
       "retrieved_titles": [
-        "AWS Lambda",
-        "AWS Lambda",
-        "AWS Lambda",
-        "AWS Lambda",
-        "AWS Lambda"
+        "Amazon EC2",
+        "Amazon RDS",
+        "Amazon EC2"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "Amazon EC2 is a virtual server service that allows users to run and manage their own servers in the cloud. It requires users to manage server and operating system maintenance, capacity provisioning, and scaling.\n\nIn contrast, serverless computing, such as AWS Lambda, runs code without the need to manage servers. Users only need to write and deploy their code, while the service provider manages the underlying infrastructure, including server and operating system maintenance, capacity provisioning, and scaling.",
-      "faithfulness": 4
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-ec2-2",
@@ -135,16 +115,12 @@
         "Amazon EC2"
       ],
       "retrieved_titles": [
-        "GCP Storage",
-        "AWS Lambda",
-        "GCP VPC",
-        "GCP VPC",
-        "AWS Lambda"
+        "Amazon EC2",
+        "Amazon EC2",
+        "Amazon RDS"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "There is no information about EC2 instance types in the provided context. The context only discusses Google Cloud and AWS Lambda, but does not mention EC2 instance types.",
-      "faithfulness": 5
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-rds-1",
@@ -154,16 +130,12 @@
         "Amazon RDS"
       ],
       "retrieved_titles": [
-        "GCP Cloud SQL",
-        "GCP Cloud SQL",
-        "AWS Lambda",
-        "AWS Lambda",
-        "GCP Compute"
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "There is no information about Amazon RDS in the provided context. The context is about Google Cloud's Cloud SQL, which supports MySQL, PostgreSQL, and SQL Server.",
-      "faithfulness": 5
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-rds-2",
@@ -173,16 +145,12 @@
         "Amazon RDS"
       ],
       "retrieved_titles": [
-        "Azure Virtual Machines",
-        "Azure Functions",
-        "Azure Active Directory",
-        "Azure SQL Database",
-        "Azure Virtual Machines"
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "RDS Multi-AZ deployment is a high availability feature in Amazon RDS (not Azure) that automatically replicates your database across multiple Availability Zones (AZs) in a single region. This provides a redundant copy of your database, ensuring that your database remains available even in the event of a zone failure or maintenance.",
-      "faithfulness": 1
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-iam-1",
@@ -192,16 +160,12 @@
         "AWS Identity and Access Management"
       ],
       "retrieved_titles": [
-        "AWS Lambda",
-        "GCP IAM",
-        "GCP IAM",
-        "AWS Lambda",
-        "GCP IAM"
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "Amazon EC2"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "AWS IAM (Identity and Access Management) is not mentioned in the provided context. However, the context does mention Google Cloud's Identity and Access Management (IAM), which lets you create and manage permissions for Google Cloud resources. It unifies access control for Google Cloud services into a single system and presents a consistent set of operations.\n\nThe problems it solves include managing permissions, access control, and security for Google Cloud resources.",
-      "faithfulness": 4
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-iam-2",
@@ -211,16 +175,12 @@
         "AWS Identity and Access Management"
       ],
       "retrieved_titles": [
-        "GCP IAM",
-        "GCP IAM",
-        "Azure Active Directory",
-        "Azure Active Directory",
-        "Azure Active Directory"
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "An IAM role and an IAM user are two different entities in Identity and Access Management (IAM). \n\nAn IAM user is a specific identity that can be used to authenticate and authorize access to Google Cloud resources. \n\nAn IAM role, on the other hand, is a set of permissions that can be assigned to a user or a service account. It defines what actions a user or service account can perform on Google Cloud resources.",
-      "faithfulness": 4
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-vpc-1",
@@ -230,16 +190,12 @@
         "Amazon VPC"
       ],
       "retrieved_titles": [
-        "GCP VPC",
-        "GCP VPC",
-        "GCP VPC",
-        "GCP Storage",
-        "GCP IAM"
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "There is no information about Amazon VPC in the provided context. The context is about Google Cloud Virtual Private Cloud (VPC).",
-      "faithfulness": 5
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "aws-vpc-2",
@@ -249,16 +205,12 @@
         "Amazon VPC"
       ],
       "retrieved_titles": [
-        "Azure Virtual Network",
-        "GCP VPC",
-        "GCP VPC",
-        "Azure Virtual Network",
-        "Azure Virtual Network"
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
       ],
-      "hit": false,
-      "rank": null,
-      "answer": "A VPC subnet is a range of IP addresses within a Virtual Private Cloud (VPC) that defines a network segment. \n\nThe difference between public and private subnets is:\n\n- Public subnets are exposed to the internet and can be accessed directly from the internet.\n- Private subnets are not exposed to the internet and can only be accessed from within the VPC or through a VPN.",
-      "faithfulness": 4
+      "hit": true,
+      "rank": 1
     },
     {
       "id": "azure-vm-1",
@@ -270,14 +222,10 @@
       "retrieved_titles": [
         "Azure Virtual Machines",
         "Azure Virtual Machines",
-        "Azure Virtual Network",
-        "Azure Virtual Network",
-        "Azure Functions"
+        "Azure Virtual Network"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Azure Virtual Machines are virtualized computing resources in Azure that can be used to deploy and run various workloads, including Windows and Linux applications, databases, and more. They are suited for a wide range of workloads, such as web servers, application servers, databases, and enterprise applications.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-vm-2",
@@ -288,15 +236,11 @@
       ],
       "retrieved_titles": [
         "Azure Virtual Machines",
-        "Azure Virtual Machines",
-        "Azure Storage",
-        "Azure Virtual Network",
-        "Azure Virtual Network"
+        "Amazon RDS",
+        "Amazon RDS"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "An Azure availability set is a logical grouping of virtual machines (VMs) that can be used to improve reliability by allowing Azure to distribute VMs across multiple physical servers and update or replace individual servers without affecting the entire application.",
-      "faithfulness": 3
+      "rank": 1
     },
     {
       "id": "azure-storage-1",
@@ -308,14 +252,10 @@
       "retrieved_titles": [
         "Azure Storage",
         "Azure Virtual Machines",
-        "GCP Storage",
-        "Azure Storage",
-        "Azure Virtual Machines"
+        "GCP Storage"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Azure Storage provides the following types of storage:\n\n1. Object storage\n2. File storage\n3. Block storage",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-storage-2",
@@ -327,14 +267,10 @@
       "retrieved_titles": [
         "Azure Storage",
         "Azure Virtual Machines",
-        "Azure Storage",
-        "GCP Storage",
-        "Azure Active Directory"
+        "Azure Storage"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Unfortunately, the provided context does not mention the access tiers of Azure Blob Storage.",
-      "faithfulness": 3
+      "rank": 1
     },
     {
       "id": "azure-sql-1",
@@ -346,14 +282,10 @@
       "retrieved_titles": [
         "Azure SQL Database",
         "Azure SQL Database",
-        "Azure SQL Database",
-        "Azure Virtual Machines",
         "Azure SQL Database"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Azure SQL Database is a cloud-based relational database service. It is different from SQL Server on a VM in that it is a managed service, meaning Microsoft handles maintenance, backups, and updates, whereas SQL Server on a VM requires manual management.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-sql-2",
@@ -364,15 +296,11 @@
       ],
       "retrieved_titles": [
         "Azure SQL Database",
-        "Azure Storage",
-        "Azure SQL Database",
-        "Azure SQL Database",
-        "Azure Virtual Machines"
+        "Amazon RDS",
+        "Amazon RDS"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Unfortunately, the provided context does not mention an \"Azure SQL Database elastic pool.\"",
-      "faithfulness": 1
+      "rank": 1
     },
     {
       "id": "azure-ad-1",
@@ -384,14 +312,10 @@
       "retrieved_titles": [
         "Azure Active Directory",
         "Azure Active Directory",
-        "GCP IAM",
-        "Azure Active Directory",
-        "Azure SQL Database"
+        "AWS Identity and Access Management"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Azure Active Directory (Azure AD) is used for business-to-consumer identity and access management for apps.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-ad-2",
@@ -402,15 +326,11 @@
       ],
       "retrieved_titles": [
         "Azure Active Directory",
-        "Azure Active Directory",
-        "Azure Active Directory",
-        "Azure Virtual Machines",
-        "GCP IAM"
+        "AWS Identity and Access Management",
+        "Azure Active Directory"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Control access to resources by enforcing policies based on user, location, device, and more.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-vnet-1",
@@ -422,14 +342,10 @@
       "retrieved_titles": [
         "Azure Virtual Network",
         "Azure Virtual Network",
-        "Azure Virtual Machines",
-        "Azure Virtual Machines",
-        "Azure Virtual Network"
+        "Azure Virtual Machines"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Azure Virtual Network is a virtual network in Azure that allows you to deploy a virtual network, control traffic filtering and routing, and connect a virtual network to other virtual networks. You can connect it to other virtual networks, on-premises networks, and virtual machines.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-vnet-2",
@@ -441,14 +357,10 @@
       "retrieved_titles": [
         "Azure Virtual Network",
         "Azure Active Directory",
-        "Azure Virtual Network",
-        "Azure Active Directory",
         "Azure Virtual Network"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "There is no direct answer to this question in the provided context. However, it mentions \"Network security groups\" as a topic under the \"Security and compliance\" section.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-functions-1",
@@ -460,14 +372,10 @@
       "retrieved_titles": [
         "Azure Functions",
         "Azure Functions",
-        "Azure SQL Database",
-        "Azure Virtual Machines",
         "Azure SQL Database"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Azure Functions is a managed platform-as-a-service (PaaS) provider that provides event-driven and scheduled compute resources for Azure cloud services. It supports various trigger types, but the documentation does not explicitly list them. However, it mentions that you can use Functions to build web APIs, respond to database changes, process IoT streams, manage message queues, and more, which implies support for various trigger types.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "azure-functions-2",
@@ -477,16 +385,12 @@
         "Azure Functions"
       ],
       "retrieved_titles": [
-        "Azure Functions",
-        "Azure Virtual Machines",
-        "Azure Active Directory",
-        "Azure Virtual Network",
-        "AWS Lambda"
+        "Amazon EC2",
+        "Amazon EC2",
+        "Azure Functions"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "Unfortunately, the provided context does not mention Azure Functions consumption plan billing.",
-      "faithfulness": 3
+      "rank": 3
     },
     {
       "id": "cross-1",
@@ -499,14 +403,10 @@
       "retrieved_titles": [
         "AWS Lambda",
         "Azure Functions",
-        "AWS Lambda",
-        "AWS Lambda",
         "AWS Lambda"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "There is no direct comparison between AWS Lambda and Azure Functions in the provided context. However, based on the general information about both services, the main differences are:\n\n- AWS Lambda is a compute service that runs code without the need to manage servers, while Azure Functions is a managed platform-as-a-service (PaaS) provider that provides event-driven and scheduled compute resources.\n- AWS Lambda uses a serverless, event-driven compute service paradigm, whereas Azure Functions uses a managed PaaS paradigm.\n- AWS Lambda is specifically mentioned to be a part of the AWS cloud services, whereas Azure Functions is a part of the Azure cloud services.",
-      "faithfulness": 4
+      "rank": 1
     },
     {
       "id": "cross-2",
@@ -517,16 +417,12 @@
         "Azure Storage"
       ],
       "retrieved_titles": [
-        "Azure Storage",
-        "GCP Storage",
-        "Azure Virtual Machines",
-        "Azure Storage",
-        "GCP Storage"
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
       ],
       "hit": true,
-      "rank": 1,
-      "answer": "There is no information provided about Amazon S3 in the given context. The context only discusses Azure Storage and Google Cloud Storage.",
-      "faithfulness": 5
+      "rank": 1
     },
     {
       "id": "cross-3",
@@ -537,16 +433,12 @@
         "Azure Active Directory"
       ],
       "retrieved_titles": [
-        "GCP IAM",
-        "Azure Active Directory",
-        "Azure Active Directory",
-        "GCP IAM",
-        "Azure Virtual Machines"
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
       ],
       "hit": true,
-      "rank": 2,
-      "answer": "The provided context does not mention AWS IAM. It discusses Google Cloud IAM and Azure Active Directory. However, based on general knowledge, AWS IAM and Azure Active Directory are both identity and access management systems used for access control. They provide similar features such as user and group management, role-based access control, and conditional access. The main difference lies in their integration with their respective cloud platforms and services.",
-      "faithfulness": 4
+      "rank": 1
     }
   ]
 }

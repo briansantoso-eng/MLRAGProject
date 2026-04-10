@@ -184,7 +184,9 @@ Every AWS query retrieved Lambda because it was the only AWS document that exist
 | Baseline — fixed corpus | 1.000 | 0.975 |
 | Auto provider detection — fixed corpus | **1.000** | **1.000** |
 
-Recall went from 0.630 to 1.000. Auto provider detection pushed MRR to a perfect 1.000 — the correct document is now always ranked first.
+Recall went from 0.630 to 1.000. Auto provider detection pushed MRR from 0.975 to 1.000 — the correct document is now always ranked first.
+
+**Corpus balance after fix:** AWS 99 chunks, GCP 27, Azure 17. The scraped AWS pages returned significantly more content. This does not affect eval accuracy (questions explicitly name services) but would bias real-world ambiguous queries toward AWS results.
 
 ![Provider Detection Chart](eval/provider_detection_chart.png)
 

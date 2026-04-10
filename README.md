@@ -12,6 +12,19 @@ This project solves that by building a RAG system grounded in the actual docs. I
 
 ---
 
+## Branch guide
+
+Each branch in this repo represents a distinct stage of the ML development process:
+
+| Branch | What it covers |
+| --- | --- |
+| `main` | Complete system with all findings merged in |
+| `Evaluation-Set-for-the-RAG` | Building the 27-question ground-truth eval set and measuring baseline performance at k=5 |
+| `ML-fine-tuning` | K-sweep across k=1,3,5,10 to find the optimal number of retrieved chunks |
+| `ML-fine-tuning-hybrid-search-embedding-model` | Two retrieval improvement experiments: BGE embedding model swap and BM25 hybrid search — both tested against the eval set with honest results |
+
+---
+
 ## How it works
 
 Real cloud docs are fetched, chunked into overlapping passages, and embedded locally using SentenceTransformers. At query time, the question is embedded the same way, and ChromaDB retrieves the closest matching passages. Those passages — not the model's prior knowledge — form the basis of the answer, generated via Groq Llama 3 8B.
@@ -78,35 +91,60 @@ A sweep across K = 1, 3, 5, 10 found the answer quickly:
 | 5 | 0.630 | 3.74 | 399s |
 | 10 | 0.630 | 3.93 | 641s |
 
-Recall plateaus completely at K=3. Going to K=5 or K=10 adds zero retrieval gain while faithfulness actually drops — the extra chunks introduce irrelevant context that dilutes the answer. K=3 is now the system default.
+Recall plateaus completely at K=3. Going higher adds zero retrieval gain while faithfulness drops — extra chunks introduce irrelevant context that dilutes the answer. K=3 is now the system default.
 
 ![K-Sweep Chart](eval/k_sweep_chart.png)
 
 ---
 
-## Embedding model comparison
+## Retrieval improvement experiments
 
-To test whether a stronger embedding model would improve recall, `BAAI/bge-base-en-v1.5` (110M params, 768-dim, trained specifically for retrieval tasks) was benchmarked against the current `all-MiniLM-L6-v2` (22M params, 384-dim, general purpose).
+Two approaches were tested to push Recall@K beyond 0.630.
+
+### Experiment 1: Stronger embedding model (BGE)
+
+Hypothesis: `all-MiniLM-L6-v2` is a small general-purpose model. Swapping to `BAAI/bge-base-en-v1.5` (5x larger, trained specifically for retrieval) should produce more discriminative embeddings.
+
+**Result: no improvement.** Both models scored identically.
 
 | Model | Recall@3 | MRR@3 | Recall@5 | MRR@5 |
 | --- | --- | --- | --- | --- |
-| MiniLM (current) | 0.630 | 0.611 | 0.630 | 0.611 |
-| BGE (new) | 0.630 | 0.611 | 0.630 | 0.611 |
+| MiniLM (384-dim, 22M params) | 0.630 | 0.611 | 0.630 | 0.611 |
+| BGE (768-dim, 110M params) | 0.630 | 0.611 | 0.630 | 0.611 |
 
-Both models score identically. The bottleneck is not the embedding model — S3 and GCP Storage are genuinely semantically similar concepts, and no dense embedding model can distinguish them without additional signal. The real fix is provider-aware metadata filtering or hybrid search (BM25), which matches on exact service names like "S3" or "IAM" regardless of semantic similarity.
+The bottleneck is not model quality. S3 and GCP Storage genuinely are semantically similar — they are both object storage services. No embedding model will separate them because their meanings are nearly identical.
 
 ![Embedding Comparison Chart](eval/embedding_comparison.png)
+
+### Experiment 2: Hybrid search (BM25 + Dense via RRF)
+
+Hypothesis: BM25 scores on exact token frequency, not semantics. A query containing "S3" should give "Amazon S3" a high BM25 score regardless of how similar GCP Storage is in meaning. Combining BM25 with dense retrieval via Reciprocal Rank Fusion should recover keyword matches that dense search misses.
+
+**Result: BM25 made things worse.**
+
+| Method | Recall@3 | MRR@3 | Recall@5 | MRR@5 |
+| --- | --- | --- | --- | --- |
+| Dense only | 0.630 | 0.611 | 0.630 | 0.611 |
+| Hybrid BM25 + Dense | 0.518 | 0.340 | 0.630 | 0.365 |
+
+At k=3 recall dropped from 0.630 to 0.518. At k=5 recall matched but MRR fell — correct docs were ranked lower. The reason: every AWS, Azure, and GCP doc contains the same words ("storage", "compute", "functions", "database"). BM25 scores all of them equally high for any query, adding noise that pushes correct results down.
+
+![Hybrid Search Chart](eval/hybrid_search_chart.png)
+
+### What the experiments revealed
+
+Both approaches failed for the same reason: this is a **provider disambiguation** problem, not a retrieval quality problem. The correct document exists in the index — the system just cannot tell which provider the user is asking about.
+
+The right fix is **automatic provider detection**: classify the query to identify the intended provider ("S3" → AWS, "Blob Storage" → Azure), then scope ChromaDB retrieval with a metadata filter. This is already partially supported via `provider_filter` — making it automatic is the logical next step.
 
 ---
 
 ## Performance improvements
 
-The first version worked but was slow. A few targeted changes made a significant difference:
-
 - **Parallel fetching** — 18 docs fetched one at a time with a 1s sleep between each. `ThreadPoolExecutor` eliminated ~18s of dead wait.
-- **Batch embeddings** — per-chunk `model.encode()` loop replaced with a single `model.encode(all_chunks, batch_size=64)` call.
-- **Cached singletons** — ChromaDB and tiktoken were re-initialized on every query. Module-level singletons removed that overhead entirely.
-- **Real streaming** — original "streaming" was fake: wait for full response, print word-by-word with `sleep(0.05)`. The actual Groq streaming API delivers the first token in ~100-300ms.
+- **Batch embeddings** — per-chunk `model.encode()` loop replaced with `model.encode(all_chunks, batch_size=64)`.
+- **Cached singletons** — ChromaDB and tiktoken re-initialized on every query. Module-level singletons removed that overhead entirely.
+- **Real streaming** — original "streaming" was fake: wait for full response, print word-by-word with `sleep(0.05)`. Groq streaming API delivers first token in ~100-300ms.
 
 ---
 

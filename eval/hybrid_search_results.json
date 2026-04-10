@@ -1,0 +1,30 @@
+{
+  "k3": {
+    "dense": {
+      "recall": 0.6296,
+      "mrr": 0.6111,
+      "hits": 17,
+      "total": 27
+    },
+    "hybrid": {
+      "recall": 0.5185,
+      "mrr": 0.3395,
+      "hits": 14,
+      "total": 27
+    }
+  },
+  "k5": {
+    "dense": {
+      "recall": 0.6296,
+      "mrr": 0.6111,
+      "hits": 17,
+      "total": 27
+    },
+    "hybrid": {
+      "recall": 0.6296,
+      "mrr": 0.3654,
+      "hits": 17,
+      "total": 27
+    }
+  }
+}

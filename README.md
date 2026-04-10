@@ -43,6 +43,7 @@ Each branch in this repo represents a distinct stage of the ML development proce
 | `Evaluation-Set-for-the-RAG` | Building the 27-question ground-truth eval set and measuring baseline performance at k=5 |
 | `ML-fine-tuning` | K-sweep across k=1,3,5,10 to find the optimal number of retrieved chunks |
 | `ML-fine-tuning-hybrid-search-embedding-model` | Two retrieval improvement experiments: BGE embedding model swap and BM25 hybrid search — both tested against the eval set with honest results |
+| `automatic-provider-detection` | Built a keyword-based provider classifier (100% accurate on eval set) and integrated it into the pipeline — reveals the true root cause is corpus imbalance, not cross-provider confusion |
 
 ---
 
@@ -152,11 +153,28 @@ At k=3 recall dropped from 0.630 to 0.518. At k=5 recall matched but MRR fell �
 
 ![Hybrid Search Chart](eval/hybrid_search_chart.png)
 
-### What the experiments revealed
+### Experiment 3: Automatic provider detection
 
-Both approaches failed for the same reason: this is a **provider disambiguation** problem, not a retrieval quality problem. The correct document exists in the index — the system just cannot tell which provider the user is asking about.
+After the first two experiments failed, inspecting the actual misses revealed a pattern: all 10 failing questions were AWS queries, and every one of them retrieved "AWS Lambda" as the top result instead of the correct service. This suggested the problem was cross-provider confusion — Lambda vs GCP Storage, for example.
 
-The right fix is **automatic provider detection**: classify the query to identify the intended provider ("S3" → AWS, "Blob Storage" → Azure), then scope ChromaDB retrieval with a metadata filter. This is already partially supported via `provider_filter` — making it automatic is the logical next step.
+A keyword-based provider classifier was built (`provider_detector.py`) and integrated into the pipeline. It detects provider signals in the query ("S3" → aws, "Azure Blob" → azure) and scopes ChromaDB retrieval to that provider, eliminating cross-provider noise entirely.
+
+**Detection accuracy: 27/27 correct (100%).** Every question — including the 3 cross-provider queries which correctly returned no filter.
+
+**Result: no improvement.** Recall stayed at 0.630.
+
+| Method | Recall@3 | MRR@3 | Recall@5 | MRR@5 |
+| --- | --- | --- | --- | --- |
+| Baseline (no filter) | 0.630 | 0.611 | 0.630 | 0.611 |
+| Auto provider detection | 0.630 | 0.611 | 0.630 | 0.611 |
+
+![Provider Detection Chart](eval/provider_detection_chart.png)
+
+### What all three experiments revealed
+
+Inspecting the misses after experiment 3 showed the real root cause: all 10 AWS misses retrieve "AWS Lambda" as the top result — even when filtered to AWS-only docs. Lambda is over-represented or better-scraped than S3, EC2, RDS, IAM, and VPC. Its chunks match the general query patterns for every AWS question, drowning out the correct service.
+
+The problem is not cross-provider confusion. It is not model size. It is not keyword matching. It is **corpus imbalance** — one document dominates retrieval within its provider. The correct fix is to re-scrape the underperforming AWS services with more thorough coverage, or to cap how many chunks from a single source can appear in top-K results.
 
 ---
 

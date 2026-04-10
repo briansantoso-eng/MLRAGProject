@@ -13,6 +13,7 @@ Metrics:
 
 import json
 import argparse
+import time
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
@@ -55,6 +56,26 @@ def check_hit(retrieved_titles, expected_sources):
     return False, None
 
 
+def _groq_call_with_retry(messages, temperature, max_tokens, max_retries=5):
+    """Call Groq with exponential backoff on rate limit errors."""
+    delay = 6
+    last_exc: Exception = RuntimeError("max_retries must be > 0")
+    for attempt in range(max_retries):
+        try:
+            return groq_client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens
+            )
+        except groq.RateLimitError as exc:
+            last_exc = exc
+            if attempt < max_retries - 1:
+                time.sleep(delay)
+                delay = min(delay * 2, 60)
+    raise last_exc
+
+
 def generate_answer(question, context):
     """Generate a grounded answer using retrieved context."""
     prompt = f"""Answer the following question using ONLY the provided context. Be concise.
@@ -65,8 +86,7 @@ CONTEXT:
 QUESTION: {question}
 
 Answer:"""
-    response = groq_client.chat.completions.create(
-        model=LLM_MODEL,
+    response = _groq_call_with_retry(
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1,
         max_tokens=400
@@ -99,8 +119,7 @@ Score the answer from 1 to 5:
 
 Respond with ONLY a single integer 1-5 and nothing else."""
 
-    response = groq_client.chat.completions.create(
-        model=LLM_MODEL,
+    response = _groq_call_with_retry(
         messages=[{"role": "user", "content": prompt}],
         temperature=0.0,
         max_tokens=5

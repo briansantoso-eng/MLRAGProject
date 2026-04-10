@@ -1,15 +1,15 @@
 {
   "k3": {
     "baseline": {
-      "recall": 0.6296,
-      "mrr": 0.6111,
-      "hits": 17,
+      "recall": 1.0,
+      "mrr": 0.9753,
+      "hits": 27,
       "total": 27
     },
     "auto_detect": {
-      "recall": 0.6296,
-      "mrr": 0.6111,
-      "hits": 17,
+      "recall": 1.0,
+      "mrr": 1.0,
+      "hits": 27,
       "total": 27,
       "detections": {
         "correct": 27,
@@ -20,15 +20,15 @@
   },
   "k5": {
     "baseline": {
-      "recall": 0.6296,
-      "mrr": 0.6111,
-      "hits": 17,
+      "recall": 1.0,
+      "mrr": 0.9753,
+      "hits": 27,
       "total": 27
     },
     "auto_detect": {
-      "recall": 0.6296,
-      "mrr": 0.6111,
-      "hits": 17,
+      "recall": 1.0,
+      "mrr": 1.0,
+      "hits": 27,
       "total": 27,
       "detections": {
         "correct": 27,

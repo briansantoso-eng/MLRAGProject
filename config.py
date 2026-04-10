@@ -85,27 +85,27 @@ DATA_SOURCES = {
             "category": "compute"
         },
         {
-            "url": "https://docs.aws.amazon.com/s3/index.html",
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
             "title": "Amazon S3",
             "category": "storage"
         },
         {
-            "url": "https://docs.aws.amazon.com/ec2/index.html",
+            "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html",
             "title": "Amazon EC2",
             "category": "compute"
         },
         {
-            "url": "https://docs.aws.amazon.com/rds/index.html",
+            "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
             "title": "Amazon RDS",
             "category": "database"
         },
         {
-            "url": "https://docs.aws.amazon.com/iam/index.html",
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
             "title": "AWS Identity and Access Management",
             "category": "security"
         },
         {
-            "url": "https://docs.aws.amazon.com/vpc/index.html",
+            "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
             "title": "Amazon VPC",
             "category": "networking"
         }

@@ -1,193 +1,144 @@
-"""
-Interactive RAG chat for the CloudDocs RAG system.
-
-This module provides a conversational interface with history and
-context-aware retrieval for follow-up questions.
-"""
+"""Interactive RAG chat with conversation memory and real-time streaming."""
 
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 import groq
-import tiktoken
 from config import (
     GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL, TEMPERATURE, MAX_TOKENS,
-    CHROMA_DB_PATH, COLLECTION_NAME, TOP_K_RETRIEVAL, MAX_CONVERSATION_HISTORY,
-    STREAMING_ENABLED
+    CHROMA_DB_PATH, COLLECTION_NAME, TOP_K_RETRIEVAL,
+    MAX_CONVERSATION_HISTORY, STREAMING_ENABLED,
 )
-import json
 
-# Initialize clients
+# ── Module-level singletons ───────────────────────────────────────────────────
+
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
-groq_client = groq.Groq(api_key=GROQ_API_KEY)
+groq_client     = groq.Groq(api_key=GROQ_API_KEY)
+
 
 class RAGChat:
     """
-    Interactive RAG chat with conversation memory.
+    Conversational RAG interface with memory and query rewriting.
 
-    CONCEPT: Conversation memory allows follow-up questions to reference
-    previous context. Query rewriting ensures the system understands
-    pronouns like "it" or "that" in the context of prior questions.
+    Two public entry points:
+      chat()         — CLI use, streams response to stdout
+      get_response() — Web UI use, returns response as a string
     """
 
     def __init__(self, quiet=False):
-        # Initialize ChromaDB
+        # Connect to (or create) the ChromaDB collection on disk
         self.chroma_client = chromadb.PersistentClient(
             path=CHROMA_DB_PATH,
-            settings=Settings(anonymized_telemetry=False)
+            settings=Settings(anonymized_telemetry=False),
         )
         self.collection = self.chroma_client.get_or_create_collection(
             name=COLLECTION_NAME,
-            metadata={"hnsw:space": "cosine"}
+            metadata={"hnsw:space": "cosine"},
         )
-
-        # Conversation memory
         self.conversation_history = []
 
         if not quiet:
             print("🤖 RAG Chat initialized!")
-            print("💡 Ask questions about AWS and Azure cloud services.")
+            print("💡 Ask questions about AWS, Azure, and GCP cloud services.")
             print("🔄 Type 'quit' to exit, 'clear' to reset memory.\n")
+
+    # ── Query rewriting ───────────────────────────────────────────────────────
 
     def rewrite_query(self, user_query):
         """
-        Rewrite follow-up questions to be self-contained.
-
-        CONCEPT: Query rewriting adds context from conversation history
-        so the retrieval system can find relevant information even for
-        vague follow-up questions like "how does it compare?"
+        Expand follow-up questions with conversation context.
+        Handles pronouns ('it', 'that', etc.) so the vector search stays accurate.
         """
         if not self.conversation_history:
             return user_query
 
-        # If this seems like a follow-up question, add context
-        follow_up_indicators = ["it", "that", "this", "those", "these", "them", "they"]
+        follow_up_words = {"it", "that", "this", "those", "these", "them", "they"}
+        if not any(w in follow_up_words for w in user_query.lower().split()):
+            return user_query
 
-        query_lower = user_query.lower()
-        if any(indicator in query_lower.split() for indicator in follow_up_indicators):
-            # Get recent context
-            recent_messages = self.conversation_history[-4:]  # Last 2 exchanges
+        # Prefix the query with a summary of the last 2 exchanges (4 messages)
+        context = " ".join(
+            f"User asked: {m['content']}" if m["role"] == "user"
+            else f"Assistant said: {m['content'][:200]}..."
+            for m in self.conversation_history[-4:]
+        )
+        return f"Context: {context}\n\nCurrent question: {user_query}"
 
-            context_parts = []
-            for msg in recent_messages:
-                if msg["role"] == "user":
-                    context_parts.append(f"User asked: {msg['content']}")
-                elif msg["role"] == "assistant":
-                    context_parts.append(f"Assistant said: {msg['content'][:200]}...")
-
-            context = " ".join(context_parts)
-
-            rewritten_query = f"Context: {context}\n\nCurrent question: {user_query}"
-            return rewritten_query
-
-        return user_query
+    # ── Retrieval ─────────────────────────────────────────────────────────────
 
     def retrieve_context(self, query, provider_filter=None):
-        """
-        Retrieve relevant context for the query.
-        """
-        # Get query embedding using local model
+        """Embed query and return top-K matching chunks from ChromaDB."""
         query_embedding = embedding_model.encode(query, convert_to_numpy=True).tolist()
-
-        # Build filter
-        where_clause = None
-        if provider_filter:
-            where_clause = {"provider": provider_filter}
-
-        # Search
         results = self.collection.query(
             query_embeddings=[query_embedding],
             n_results=TOP_K_RETRIEVAL,
-            where=where_clause,
-            include=["documents", "metadatas", "distances"]
+            where={"provider": provider_filter} if provider_filter else None,
+            include=["documents", "metadatas", "distances"],
         )
+        if not results:
+            return []
+        if not results["documents"]:
+            return []
+        docs  = results["documents"][0]
+        metas = (results["metadatas"] or [[]])[0]
+        dists = (results["distances"] or [[]])[0]
+        return [
+            {"text": doc, "metadata": meta, "similarity": 1 - dist}
+            for doc, meta, dist in zip(docs, metas, dists)
+        ]
 
-        # Format results
-        context_chunks = []
-        if results and results["documents"]:
-            for doc, metadata, distance in zip(
-                results["documents"][0],
-                results["metadatas"][0],
-                results["distances"][0]
-            ):
-                similarity = 1 - distance
-                context_chunks.append({
-                    "text": doc,
-                    "metadata": metadata,
-                    "similarity": similarity
-                })
-
-        return context_chunks
+    # ── Prompt building ───────────────────────────────────────────────────────
 
     def build_chat_prompt(self, user_query, context_chunks):
-        """
-        Build prompt for chat response.
-        """
-        # Add context from retrieved chunks
-        context_parts = []
-        for i, chunk in enumerate(context_chunks, 1):
-            context_parts.append(f"""
-[Source {i}] {chunk['metadata']['title']} ({chunk['metadata']['provider'].upper()})
-Similarity: {chunk['similarity']:.3f}
-{chunk['text']}
-""")
+        """Combine retrieved sources and conversation history into a single prompt."""
+        context = "\n".join(
+            f"[Source {i}] {c['metadata']['title']} ({c['metadata']['provider'].upper()})\n"
+            f"Similarity: {c['similarity']:.3f}\n{c['text']}"
+            for i, c in enumerate(context_chunks, 1)
+        )
+        history = "\n".join(
+            f"{'User' if m['role'] == 'user' else 'Assistant'}: {m['content']}"
+            for m in self.conversation_history[-MAX_CONVERSATION_HISTORY * 2:]
+        )
+        return (
+            f"You are a helpful cloud computing expert helping users understand AWS and Azure services.\n\n"
+            f"CONVERSATION HISTORY:\n{history}\n\n"
+            f"RELEVANT DOCUMENTATION:\n{context}\n\n"
+            f"CURRENT QUESTION: {user_query}\n\n"
+            f"INSTRUCTIONS:\n"
+            f"- Answer based on the provided documentation and conversation history\n"
+            f"- Be conversational but informative\n"
+            f"- Reference specific services and their providers when relevant\n"
+            f"- If you need more information, ask clarifying questions\n"
+            f"- Keep responses focused and actionable\n\n"
+            f"RESPONSE:"
+        )
 
-        context = "\n".join(context_parts)
-
-        # Add conversation history
-        history_parts = []
-        for msg in self.conversation_history[-MAX_CONVERSATION_HISTORY*2:]:  # Last N exchanges
-            role = "User" if msg["role"] == "user" else "Assistant"
-            history_parts.append(f"{role}: {msg['content']}")
-
-        history = "\n".join(history_parts)
-
-        prompt = f"""You are a helpful cloud computing expert helping users understand AWS and Azure services.
-
-CONVERSATION HISTORY:
-{history}
-
-RELEVANT DOCUMENTATION:
-{context}
-
-CURRENT QUESTION: {user_query}
-
-INSTRUCTIONS:
-- Answer based on the provided documentation and conversation history
-- Be conversational but informative
-- Reference specific services and their providers when relevant
-- If you need more information, ask clarifying questions
-- Keep responses focused and actionable
-
-RESPONSE:"""
-
-        return prompt
+    # ── History management ────────────────────────────────────────────────────
 
     def add_to_history(self, role, content):
-        """
-        Add message to conversation history.
-        """
-        self.conversation_history.append({
-            "role": role,
-            "content": content
-        })
+        """Append a message and trim to MAX_CONVERSATION_HISTORY pairs."""
+        self.conversation_history.append({"role": role, "content": content})
+        max_msgs = MAX_CONVERSATION_HISTORY * 2
+        if len(self.conversation_history) > max_msgs:
+            self.conversation_history = self.conversation_history[-max_msgs:]
 
-        # Trim history if too long
-        if len(self.conversation_history) > MAX_CONVERSATION_HISTORY * 2:
-            self.conversation_history = self.conversation_history[-MAX_CONVERSATION_HISTORY*2:]
+    # ── Generation ────────────────────────────────────────────────────────────
 
     def generate_response(self, prompt, return_only=False):
         """
-        Generate response using Groq (fast inference).
+        Call Groq LLM. Streams tokens to stdout when return_only=False.
+        Uses Groq's native streaming API — first token appears in ~100–300ms.
         """
         try:
             if not return_only and STREAMING_ENABLED:
+                # Stream tokens as they arrive — no artificial delay
                 stream = groq_client.chat.completions.create(
                     model=LLM_MODEL,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=TEMPERATURE,
                     max_tokens=MAX_TOKENS,
-                    stream=True
+                    stream=True,
                 )
                 response_text = ""
                 for chunk in stream:
@@ -199,11 +150,12 @@ RESPONSE:"""
                         response_text += content
                 print()
             else:
-                response = groq_client.chat.completions.create(
+                # Non-streaming path — used by get_response() for the web UI
+                response      = groq_client.chat.completions.create(
                     model=LLM_MODEL,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=TEMPERATURE,
-                    max_tokens=MAX_TOKENS
+                    max_tokens=MAX_TOKENS,
                 )
                 response_text = response.choices[0].message.content or ""
                 if not return_only:
@@ -217,71 +169,88 @@ RESPONSE:"""
                 print(f"❌ {error_msg}")
             raise Exception(error_msg + "\nPlease check your GROQ_API_KEY is set correctly in Secrets.")
 
-    def chat(self, user_query, provider_filter=None):
-        """
-        Process a single chat message.
-        """
-        # Rewrite query for context
-        rewritten_query = self.rewrite_query(user_query)
+    # ── Public chat interfaces ────────────────────────────────────────────────
 
-        # Retrieve context
-        context_chunks = self.retrieve_context(rewritten_query, provider_filter)
+    def chat(self, user_query, provider_filter=None):
+        """Process a CLI chat turn — retrieves context, streams response."""
+        rewritten      = self.rewrite_query(user_query)
+        context_chunks = self.retrieve_context(rewritten, provider_filter)
 
         if not context_chunks:
-            response = "I don't have enough information in my knowledge base to answer that question. Could you try rephrasing it or asking about AWS/Azure cloud services?"
+            response = (
+                "I don't have enough information in my knowledge base to answer that question. "
+                "Could you try rephrasing it or asking about AWS/Azure cloud services?"
+            )
             print(f"🤖 {response}")
             self.add_to_history("user", user_query)
             self.add_to_history("assistant", response)
             return
 
-        # Build prompt
-        prompt = self.build_chat_prompt(user_query, context_chunks)
-
-        # Show retrieved sources
-        sources = [f"{chunk['metadata']['title']} ({chunk['metadata']['provider'].upper()})" for chunk in context_chunks[:3]]
-        print(f"📚 Sources: {', '.join(sources)}")
-
-        # Generate response
+        sources = ", ".join(
+            f"{c['metadata']['title']} ({c['metadata']['provider'].upper()})"
+            for c in context_chunks[:3]
+        )
+        print(f"📚 Sources: {sources}")
         print("🤖 ", end="")
-        response = self.generate_response(prompt)
-
-        # Add to history
+        response = self.generate_response(self.build_chat_prompt(user_query, context_chunks))
         self.add_to_history("user", user_query)
         self.add_to_history("assistant", response)
 
+    def get_response(self, user_query, provider_filter=None):
+        """Return response as a string with source citations (used by Streamlit UI)."""
+        rewritten      = self.rewrite_query(user_query)
+        context_chunks = self.retrieve_context(rewritten, provider_filter)
+
+        if not context_chunks:
+            response = (
+                "I don't have enough information in my knowledge base to answer that question. "
+                "Could you try rephrasing it or asking about AWS/Azure/GCP cloud services?"
+            )
+            self.add_to_history("user", user_query)
+            self.add_to_history("assistant", response)
+            return response
+
+        response = self.generate_response(
+            self.build_chat_prompt(user_query, context_chunks),
+            return_only=True,
+        )
+
+        # Append markdown source links for the web UI
+        sources = [
+            f"- [{c['metadata'].get('title', 'Unknown')}]({c['metadata'].get('url', '#')}) "
+            f"({c['metadata'].get('provider', 'unknown').upper()})"
+            for c in context_chunks[:3]
+        ]
+        if sources:
+            response += "\n\n**📚 Sources:**\n" + "\n".join(sources)
+
+        self.add_to_history("user", user_query)
+        self.add_to_history("assistant", response)
+        return response
+
+    # ── Interactive CLI loop ──────────────────────────────────────────────────
+
     def run_interactive_chat(self):
-        """
-        Run the interactive chat loop.
-        """
+        """Run the REPL-style CLI chat loop."""
         while True:
             try:
-                # Get user input
                 user_input = input("\n👤 You: ").strip()
-
                 if not user_input:
                     continue
-
-                if user_input.lower() in ['quit', 'exit', 'bye']:
+                if user_input.lower() in ("quit", "exit", "bye"):
                     print("👋 Goodbye! Happy cloud computing!")
                     break
-
-                if user_input.lower() == 'clear':
+                if user_input.lower() == "clear":
                     self.conversation_history = []
                     print("🧹 Conversation memory cleared.")
                     continue
-
-                if user_input.lower().startswith('filter '):
-                    # Handle provider filtering
-                    parts = user_input.split(' ', 2)
-                    if len(parts) >= 3:
-                        provider = parts[1].lower()
-                        if provider in ['aws', 'azure']:
-                            query = parts[2]
-                            print(f"🔍 Filtering to {provider.upper()} only...")
-                            self.chat(query, provider)
-                            continue
-
-                # Normal chat
+                # Optional syntax: "filter aws <question>"
+                if user_input.lower().startswith("filter "):
+                    parts = user_input.split(" ", 2)
+                    if len(parts) >= 3 and parts[1].lower() in ("aws", "azure", "gcp"):
+                        print(f"🔍 Filtering to {parts[1].upper()} only...")
+                        self.chat(parts[2], parts[1].lower())
+                        continue
                 self.chat(user_input)
 
             except KeyboardInterrupt:
@@ -289,47 +258,3 @@ RESPONSE:"""
                 break
             except Exception as e:
                 print(f"❌ Error: {e}")
-                continue
-
-    def get_response(self, user_query, provider_filter=None):
-        """
-        Get response for web interface (returns string instead of printing).
-        """
-        # Rewrite query for context
-        rewritten_query = self.rewrite_query(user_query)
-
-        # Retrieve context
-        context_chunks = self.retrieve_context(rewritten_query, provider_filter)
-
-        if not context_chunks:
-            response = "I don't have enough information in my knowledge base to answer that question. Could you try rephrasing it or asking about AWS/Azure/GCP cloud services?"
-            self.add_to_history("user", user_query)
-            self.add_to_history("assistant", response)
-            return response
-
-        # Build prompt
-        prompt = self.build_chat_prompt(user_query, context_chunks)
-
-        # Generate response
-        response = self.generate_response(prompt, return_only=True)
-
-        # Add source information
-        if context_chunks:
-            sources = []
-            for chunk in context_chunks[:3]:  # Show top 3 sources
-                metadata = chunk['metadata']
-                provider = metadata.get('provider', 'unknown').upper()
-                title = metadata.get('title', 'Unknown')
-                url = metadata.get('url', '#')
-                sources.append(f"- [{title}]({url}) ({provider})")
-
-            if sources:
-                response += "\n\n**📚 Sources:**\n" + "\n".join(sources)
-
-        # Add to history
-        self.add_to_history("user", user_query)
-        self.add_to_history("assistant", response)
-
-        return response
-
-    

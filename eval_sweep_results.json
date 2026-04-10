@@ -1,0 +1,94 @@
+{
+  "sweep_results": [
+    {
+      "k": 1,
+      "faithfulness_scoring": false,
+      "recall": 0.593,
+      "mrr": 0.593,
+      "avg_faithfulness": null,
+      "time_s": 1.9
+    },
+    {
+      "k": 1,
+      "faithfulness_scoring": true,
+      "recall": 0.593,
+      "mrr": 0.593,
+      "avg_faithfulness": 3.85,
+      "time_s": 133.4
+    },
+    {
+      "k": 3,
+      "faithfulness_scoring": false,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": null,
+      "time_s": 0.5
+    },
+    {
+      "k": 3,
+      "faithfulness_scoring": true,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": 4.11,
+      "time_s": 308.5
+    },
+    {
+      "k": 5,
+      "faithfulness_scoring": false,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": null,
+      "time_s": 0.9
+    },
+    {
+      "k": 5,
+      "faithfulness_scoring": true,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": 3.74,
+      "time_s": 398.7
+    },
+    {
+      "k": 10,
+      "faithfulness_scoring": false,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": null,
+      "time_s": 0.6
+    },
+    {
+      "k": 10,
+      "faithfulness_scoring": true,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": 3.93,
+      "time_s": 641.2
+    }
+  ],
+  "recommendations": {
+    "best_time": {
+      "k": 3,
+      "faithfulness_scoring": false,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": null,
+      "time_s": 0.5
+    },
+    "best_result": {
+      "k": 3,
+      "faithfulness_scoring": true,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": 4.11,
+      "time_s": 308.5
+    },
+    "best_balanced": {
+      "k": 3,
+      "faithfulness_scoring": false,
+      "recall": 0.63,
+      "mrr": 0.611,
+      "avg_faithfulness": null,
+      "time_s": 0.5
+    }
+  }
+}

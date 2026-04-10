@@ -1,180 +1,134 @@
-"""
-Document ingestion and chunking for the CloudDocs RAG system.
-
-This module fetches AWS and Azure documentation pages, cleans HTML,
-and splits content into meaningful chunks with metadata.
-"""
+"""Fetch cloud documentation pages, clean HTML, and split into overlapping chunks."""
 
 import requests
 from bs4 import BeautifulSoup
 import json
-import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import DATA_SOURCES, CHUNK_SIZE, CHUNK_OVERLAP
 
+
+# ── Text cleaning ─────────────────────────────────────────────────────────────
+
 def clean_html_text(html_content):
-    """
-    Clean HTML content and extract readable text.
+    """Strip HTML tags, scripts, and nav elements; return clean plain text."""
+    soup = BeautifulSoup(html_content, "html.parser")
 
-    CONCEPT: HTML parsing removes tags, scripts, and navigation elements,
-    leaving only the main content text that's useful for RAG.
-    """
-    soup = BeautifulSoup(html_content, 'html.parser')
+    # Remove non-content elements
+    for tag in soup(["script", "style", "nav", "header", "footer"]):
+        tag.decompose()
 
-    # Remove script and style elements
-    for script in soup(["script", "style", "nav", "header", "footer"]):
-        script.decompose()
-
-    # Get text and clean it up
-    text = soup.get_text()
-
-    # Clean up whitespace
-    lines = (line.strip() for line in text.splitlines())
+    # Collapse whitespace: splitlines → strip each line → rejoin
+    lines  = (line.strip() for line in soup.get_text().splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    text = ' '.join(chunk for chunk in chunks if chunk)
+    return " ".join(chunk for chunk in chunks if chunk)
 
-    return text
+
+# ── Chunking ──────────────────────────────────────────────────────────────────
 
 def chunk_text(text, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
     """
-    Split text into overlapping chunks using sliding window technique.
-
-    CONCEPT: Sliding window chunking maintains context between chunks
-    by overlapping them. This prevents losing meaning at chunk boundaries.
-
-    Example: Text "The quick brown fox jumps over the lazy dog"
-    With chunk_size=20, overlap=5:
-    Chunk 1: "The quick brown fox "
-    Chunk 2: "fox jumps over the l"
-    Chunk 3: "the lazy dog"
+    Sliding-window chunking with sentence-boundary snapping.
+    Overlap keeps context intact across chunk edges.
     """
     chunks = []
-    start = 0
+    start  = 0
 
     while start < len(text):
         end = start + chunk_size
 
-        # If we're not at the end, try to break at a sentence or word boundary
         if end < len(text):
-            # Look for sentence endings within the last 100 characters
-            search_end = min(end + 100, len(text))
-            sentence_end = text.rfind('.', end, search_end)
+            # Prefer breaking at a sentence end, then a word boundary
+            search_end   = min(end + 100, len(text))
+            sentence_end = text.rfind(".", end, search_end)
             if sentence_end != -1:
                 end = sentence_end + 1
-            else:
-                # Look for word boundaries
-                space_pos = text.rfind(' ', end, search_end)
-                if space_pos != -1:
-                    end = space_pos
+            elif (space := text.rfind(" ", end, search_end)) != -1:
+                end = space
 
-        chunk = text[start:end].strip()
-        if chunk:  # Only add non-empty chunks
+        if chunk := text[start:end].strip():
             chunks.append(chunk)
 
-        # Move start position with overlap
         start = end - overlap
-
-        # Prevent infinite loop
         if start >= len(text):
             break
 
     return chunks
 
-def fetch_document(url, title, category, provider):
-    """
-    Fetch a single document from the web.
 
-    CONCEPT: Each document gets rich metadata (source, URL, category)
-    that enables filtering and citation in the RAG system later.
-    """
+# ── Document fetching ─────────────────────────────────────────────────────────
+
+def fetch_document(url, title, category, provider):
+    """Fetch a URL, clean its HTML, and return a structured document dict."""
     try:
         print(f"Fetching: {title} ({url})")
-
-        # Add headers to look like a real browser
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-
+        headers  = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
 
-        # Clean the HTML content
         clean_text = clean_html_text(response.text)
+        chunks     = chunk_text(clean_text)
 
-        # Create chunks
-        chunks = chunk_text(clean_text)
-
-        # Create document metadata
-        document = {
-            "title": title,
-            "url": url,
-            "provider": provider,  # "aws" or "azure"
-            "category": category,  # "compute", "storage", etc.
-            "content": clean_text,
-            "chunks": chunks,
+        print(f"  ✓ {len(chunks)} chunks ({len(clean_text)} chars)")
+        return {
+            "title":       title,
+            "url":         url,
+            "provider":    provider,
+            "category":    category,
+            "content":     clean_text,
+            "chunks":      chunks,
             "chunk_count": len(chunks),
-            "total_chars": len(clean_text)
+            "total_chars": len(clean_text),
         }
 
-        print(f"  ✓ Processed {len(chunks)} chunks ({len(clean_text)} chars)")
-        return document
-
     except Exception as e:
-        print(f"  ✗ Error fetching {url}: {str(e)}")
+        print(f"  ✗ Error fetching {url}: {e}")
         return None
 
+
+# ── Main pipeline ─────────────────────────────────────────────────────────────
+
 def main():
-    """
-    Main ingestion pipeline.
-
-    CONCEPT: This creates a structured dataset of cloud documentation
-    that will be embedded and stored for retrieval later.
-    """
+    """Fetch all configured docs in parallel and save chunks to JSON."""
     print("🚀 Starting document ingestion...")
-    print(f"Target chunk size: {CHUNK_SIZE} chars, overlap: {CHUNK_OVERLAP} chars\n")
+    print(f"Chunk size: {CHUNK_SIZE} chars, overlap: {CHUNK_OVERLAP} chars\n")
 
-    all_doc_configs = [
-        (provider, doc_config)
+    # Flatten provider → doc-list into a single list for parallel fetching
+    all_configs = [
+        (provider, cfg)
         for provider, docs in DATA_SOURCES.items()
-        for doc_config in docs
+        for cfg in docs
     ]
 
     all_documents = []
-
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {
-            executor.submit(
-                fetch_document,
-                cfg["url"], cfg["title"], cfg["category"], provider
-            ): cfg["title"]
-            for provider, cfg in all_doc_configs
+            executor.submit(fetch_document, cfg["url"], cfg["title"], cfg["category"], provider): cfg["title"]
+            for provider, cfg in all_configs
         }
         for future in as_completed(futures):
-            doc = future.result()
-            if doc:
+            if doc := future.result():
                 all_documents.append(doc)
 
-    # Save the processed documents
+    # Persist to disk for step2 to consume
     output_file = "processed_documents.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         json.dump(all_documents, f, indent=2, ensure_ascii=False)
 
-    # Print summary
-    total_chunks = sum(doc["chunk_count"] for doc in all_documents)
-    total_chars = sum(doc["total_chars"] for doc in all_documents)
+    total_chunks = sum(d["chunk_count"] for d in all_documents)
+    total_chars  = sum(d["total_chars"]  for d in all_documents)
 
     print("\n✅ Ingestion complete!")
-    print(f"📄 Documents processed: {len(all_documents)}")
-    print(f"📦 Total chunks created: {total_chunks}")
-    print(f"📊 Total characters: {total_chars:,}")
-    print(f"💾 Saved to: {output_file}")
+    print(f"📄 Documents: {len(all_documents)}")
+    print(f"📦 Chunks:    {total_chunks}")
+    print(f"📊 Chars:     {total_chars:,}")
+    print(f"💾 Saved to:  {output_file}")
 
-    # Show sample chunk
     if all_documents:
-        sample_doc = all_documents[0]
-        print(f"\n📖 Sample chunk from {sample_doc['title']}:")
+        sample = all_documents[0]["chunks"][0]
+        print(f"\n📖 Sample chunk from {all_documents[0]['title']}:")
         print("-" * 50)
-        print(sample_doc["chunks"][0][:200] + "..." if len(sample_doc["chunks"][0]) > 200 else sample_doc["chunks"][0])
+        print(sample[:200] + "..." if len(sample) > 200 else sample)
+
 
 if __name__ == "__main__":
     main()

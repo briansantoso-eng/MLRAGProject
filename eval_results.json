@@ -2,7 +2,7 @@
   "summary": {
     "n": 27,
     "recall_at_3": 1.0,
-    "mrr_at_3": 0.9753,
+    "mrr_at_3": 1.0,
     "avg_faithfulness": null
   },
   "per_category": {
@@ -236,7 +236,7 @@
       ],
       "retrieved_titles": [
         "Azure Virtual Machines",
-        "Amazon RDS",
+        "Azure Virtual Machines",
         "Amazon RDS"
       ],
       "hit": true,
@@ -385,12 +385,12 @@
         "Azure Functions"
       ],
       "retrieved_titles": [
-        "Amazon EC2",
-        "Amazon EC2",
-        "Azure Functions"
+        "Azure Functions",
+        "Azure Virtual Machines",
+        "Azure Active Directory"
       ],
       "hit": true,
-      "rank": 3
+      "rank": 1
     },
     {
       "id": "cross-1",
@@ -419,7 +419,7 @@
       "retrieved_titles": [
         "Amazon S3",
         "Amazon S3",
-        "Amazon S3"
+        "Azure Storage"
       ],
       "hit": true,
       "rank": 1

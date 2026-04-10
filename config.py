@@ -69,8 +69,9 @@ CHROMA_DB_PATH = "./chroma_db"
 COLLECTION_NAME = "cloud_docs"
 
 # Document Processing Configuration
-CHUNK_SIZE = 1000  # Characters per chunk
-CHUNK_OVERLAP = 200  # Overlap between chunks for context continuity
+CHUNK_SIZE = 1000          # Characters per chunk
+CHUNK_OVERLAP = 200        # Overlap between chunks for context continuity
+MAX_CHUNKS_PER_DOC = 8     # Cap per document to prevent corpus imbalance
 
 # Retrieval Configuration
 TOP_K_RETRIEVAL = 5  # Number of chunks to retrieve

@@ -46,10 +46,14 @@ def initialize_chroma():
         settings=Settings(anonymized_telemetry=False)
     )
 
-    # Create or get collection
-    collection = chroma_client.get_or_create_collection(
+    # Drop and recreate collection to ensure clean rebuild on each run
+    try:
+        chroma_client.delete_collection(name=COLLECTION_NAME)
+    except Exception:
+        pass
+    collection = chroma_client.create_collection(
         name=COLLECTION_NAME,
-        metadata={"dimension": EMBEDDING_DIMENSION}
+        metadata={"hnsw:space": "cosine"}
     )
 
     return chroma_client, collection
@@ -156,6 +160,8 @@ def process_documents(documents_file="processed_documents.json"):
     except:
         pass
 
+    return collection
+
 def test_similarity_search(collection):
     """
     Demonstrate vector similarity search.
@@ -199,12 +205,10 @@ def test_similarity_search(collection):
                 print()
 
 def main():
-    # Process documents
-    process_documents()
-
-    # Test similarity search
-    chroma_client, collection = initialize_chroma()
-    test_similarity_search(collection)
+    # Process documents and get the collection back for testing
+    collection = process_documents()
+    if collection is not None:
+        test_similarity_search(collection)
 
 if __name__ == "__main__":
     main()

@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from config import DATA_SOURCES, CHUNK_SIZE, CHUNK_OVERLAP
+from config import DATA_SOURCES, CHUNK_SIZE, CHUNK_OVERLAP, MAX_CHUNKS_PER_DOC
 
 def clean_html_text(html_content):
     """
@@ -101,8 +101,8 @@ def fetch_document(url, title, category, provider):
         # Clean the HTML content
         clean_text = clean_html_text(response.text)
 
-        # Create chunks
-        chunks = chunk_text(clean_text)
+        # Create chunks, capped per doc to prevent corpus imbalance
+        chunks = chunk_text(clean_text)[:MAX_CHUNKS_PER_DOC]
 
         # Create document metadata
         document = {

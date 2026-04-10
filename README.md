@@ -90,6 +90,7 @@ The eval set was built in three phases, each harder than the last:
 | **Hard** | 15 q | "My Lambda function times out connecting to RDS — what is misconfigured?" | Business problems, cross-vocabulary, failure scenarios, no cloud terms |
 
 The hard tier includes:
+
 - **Business language** — no cloud terminology at all ("our database goes down during maintenance")
 - **Cross-vocabulary** — uses one provider's name to ask about another ("what is GCP's equivalent of EC2?")
 - **Failure scenarios** — describes a symptom, not a service ("Lambda times out connecting to RDS")
@@ -103,8 +104,9 @@ Final eval set: **62 questions** across all 6 categories.
 | --- | --- | --- | --- |
 | Recall@3 | 1.000 | 1.000 | **0.919** |
 | MRR@3 | 1.000 | 0.922 | **0.812** |
+| Faithfulness | — | 4.13 / 5 | **4.24 / 5** |
 
-Recall dropped to 0.919 — 5 questions genuinely failed. MRR dropped to 0.812. These are honest production numbers.
+Recall dropped to 0.919 — 5 questions genuinely failed. MRR dropped to 0.812. Faithfulness stayed high at 4.24/5, meaning retrieved context produces grounded answers even on harder queries.
 
 **The 5 misses and why:**
 
@@ -118,14 +120,14 @@ Recall dropped to 0.919 — 5 questions genuinely failed. MRR dropped to 0.812. 
 
 All 5 misses fall in security or networking. Both categories use conceptual language — "least privilege", "isolation", "access control" — that the embedding model struggles to map to specific service chunks.
 
-| Category | Recall@3 (62 q) |
-| --- | --- |
-| Compute | 100% (15/15) |
-| Storage | 100% (10/10) |
-| Database | 100% (8/8) |
-| Cross-provider | 100% (9/9) |
-| Networking | 78% (7/9) |
-| Security | 73% (8/11) |
+| Category | Recall@3 | Faithfulness |
+| --- | --- | --- |
+| Compute | 100% (15/15) | 4.4 / 5 |
+| Storage | 100% (10/10) | 4.6 / 5 |
+| Database | 100% (8/8) | 4.4 / 5 |
+| Networking | 78% (7/9) | 4.3 / 5 |
+| Cross-provider | 100% (9/9) | 3.8 / 5 |
+| Security | 73% (8/11) | 3.9 / 5 |
 
 ### Baseline (before corpus fix)
 

@@ -1,0 +1,218 @@
+[
+  {
+    "id": "aws-lambda-1",
+    "question": "What is AWS Lambda and what is it used for?",
+    "expected_sources": ["AWS Lambda"],
+    "expected_provider": "aws",
+    "category": "compute",
+    "reference_answer": "AWS Lambda is a serverless compute service that runs code in response to events without provisioning or managing servers. You pay only for the compute time consumed."
+  },
+  {
+    "id": "aws-lambda-2",
+    "question": "How does AWS Lambda scale automatically?",
+    "expected_sources": ["AWS Lambda"],
+    "expected_provider": "aws",
+    "category": "compute",
+    "reference_answer": "AWS Lambda automatically scales by running code in response to each trigger. It handles scaling from a few requests per day to thousands per second without any configuration."
+  },
+  {
+    "id": "aws-s3-1",
+    "question": "What is Amazon S3 and what kind of data can you store in it?",
+    "expected_sources": ["Amazon S3"],
+    "expected_provider": "aws",
+    "category": "storage",
+    "reference_answer": "Amazon S3 (Simple Storage Service) is an object storage service that stores any type of data as objects within buckets. It is designed for durability, availability, and scalability."
+  },
+  {
+    "id": "aws-s3-2",
+    "question": "What are S3 storage classes and when would you use each?",
+    "expected_sources": ["Amazon S3"],
+    "expected_provider": "aws",
+    "category": "storage",
+    "reference_answer": "S3 storage classes include S3 Standard for frequently accessed data, S3 Infrequent Access for less frequent access, S3 Glacier for long-term archival, and S3 Intelligent-Tiering for unknown access patterns."
+  },
+  {
+    "id": "aws-ec2-1",
+    "question": "What is Amazon EC2 and how does it differ from serverless computing?",
+    "expected_sources": ["Amazon EC2"],
+    "expected_provider": "aws",
+    "category": "compute",
+    "reference_answer": "Amazon EC2 provides resizable virtual servers in the cloud. Unlike serverless, you manage the underlying server configuration, operating system, and scaling, giving you more control but more responsibility."
+  },
+  {
+    "id": "aws-ec2-2",
+    "question": "What are EC2 instance types and how do you choose the right one?",
+    "expected_sources": ["Amazon EC2"],
+    "expected_provider": "aws",
+    "category": "compute",
+    "reference_answer": "EC2 instance types are categorized by compute, memory, storage, and network performance. General purpose, compute optimized, memory optimized, and storage optimized families each suit different workload profiles."
+  },
+  {
+    "id": "aws-rds-1",
+    "question": "What database engines does Amazon RDS support?",
+    "expected_sources": ["Amazon RDS"],
+    "expected_provider": "aws",
+    "category": "database",
+    "reference_answer": "Amazon RDS supports MySQL, PostgreSQL, MariaDB, Oracle, Microsoft SQL Server, and Amazon Aurora. Each engine is managed by AWS, handling patching, backups, and failover."
+  },
+  {
+    "id": "aws-rds-2",
+    "question": "What is RDS Multi-AZ deployment and why would you use it?",
+    "expected_sources": ["Amazon RDS"],
+    "expected_provider": "aws",
+    "category": "database",
+    "reference_answer": "RDS Multi-AZ automatically provisions a standby replica in a different availability zone. It provides high availability and automatic failover in the event of a primary database failure."
+  },
+  {
+    "id": "aws-iam-1",
+    "question": "What is AWS IAM and what problems does it solve?",
+    "expected_sources": ["AWS Identity and Access Management"],
+    "expected_provider": "aws",
+    "category": "security",
+    "reference_answer": "AWS IAM lets you securely control access to AWS services and resources. It solves the problem of managing who can do what in your AWS account through users, groups, roles, and policies."
+  },
+  {
+    "id": "aws-iam-2",
+    "question": "What is the difference between an IAM role and an IAM user?",
+    "expected_sources": ["AWS Identity and Access Management"],
+    "expected_provider": "aws",
+    "category": "security",
+    "reference_answer": "An IAM user has permanent credentials tied to a specific person. An IAM role has temporary credentials assumed by trusted entities like EC2 instances or Lambda functions, making it better for service-to-service access."
+  },
+  {
+    "id": "aws-vpc-1",
+    "question": "What is Amazon VPC and why is it important for cloud networking?",
+    "expected_sources": ["Amazon VPC"],
+    "expected_provider": "aws",
+    "category": "networking",
+    "reference_answer": "Amazon VPC (Virtual Private Cloud) lets you launch AWS resources in a logically isolated network that you define. You control IP address ranges, subnets, route tables, and network gateways."
+  },
+  {
+    "id": "aws-vpc-2",
+    "question": "What is a VPC subnet and what is the difference between public and private subnets?",
+    "expected_sources": ["Amazon VPC"],
+    "expected_provider": "aws",
+    "category": "networking",
+    "reference_answer": "A subnet is a range of IP addresses within your VPC. A public subnet has a route to an internet gateway, making resources reachable from the internet. A private subnet has no such route, isolating resources from direct internet access."
+  },
+  {
+    "id": "azure-vm-1",
+    "question": "What are Azure Virtual Machines and what workloads are they suited for?",
+    "expected_sources": ["Azure Virtual Machines"],
+    "expected_provider": "azure",
+    "category": "compute",
+    "reference_answer": "Azure Virtual Machines provide on-demand, scalable computing resources. They are suited for workloads requiring full OS control, custom software environments, or migrating existing on-premises applications to the cloud."
+  },
+  {
+    "id": "azure-vm-2",
+    "question": "What is an Azure availability set and how does it improve reliability?",
+    "expected_sources": ["Azure Virtual Machines"],
+    "expected_provider": "azure",
+    "category": "compute",
+    "reference_answer": "An Azure availability set distributes VMs across multiple fault domains and update domains. This prevents all VMs from being affected by a single hardware failure or planned maintenance event."
+  },
+  {
+    "id": "azure-storage-1",
+    "question": "What types of storage does Azure Storage provide?",
+    "expected_sources": ["Azure Storage"],
+    "expected_provider": "azure",
+    "category": "storage",
+    "reference_answer": "Azure Storage provides Blob Storage for unstructured data, File Storage for managed file shares, Queue Storage for messaging, and Table Storage for NoSQL structured data."
+  },
+  {
+    "id": "azure-storage-2",
+    "question": "What are the Azure Blob Storage access tiers?",
+    "expected_sources": ["Azure Storage"],
+    "expected_provider": "azure",
+    "category": "storage",
+    "reference_answer": "Azure Blob Storage access tiers are Hot (frequent access), Cool (infrequent access, lower storage cost), and Archive (rarely accessed data with lowest cost and highest retrieval latency)."
+  },
+  {
+    "id": "azure-sql-1",
+    "question": "What is Azure SQL Database and how is it different from SQL Server on a VM?",
+    "expected_sources": ["Azure SQL Database"],
+    "expected_provider": "azure",
+    "category": "database",
+    "reference_answer": "Azure SQL Database is a fully managed PaaS database service built on SQL Server. Unlike running SQL Server on a VM, Azure handles patching, backups, and high availability automatically."
+  },
+  {
+    "id": "azure-sql-2",
+    "question": "What is an Azure SQL Database elastic pool?",
+    "expected_sources": ["Azure SQL Database"],
+    "expected_provider": "azure",
+    "category": "database",
+    "reference_answer": "An elastic pool is a collection of databases that share a set of resources. It is cost-effective for multiple databases with unpredictable usage patterns, as they share pooled compute and storage."
+  },
+  {
+    "id": "azure-ad-1",
+    "question": "What is Azure Active Directory and how is it used for identity management?",
+    "expected_sources": ["Azure Active Directory"],
+    "expected_provider": "azure",
+    "category": "security",
+    "reference_answer": "Azure Active Directory is a cloud-based identity and access management service. It handles authentication, single sign-on, and multi-factor authentication for users accessing Azure and third-party applications."
+  },
+  {
+    "id": "azure-ad-2",
+    "question": "What is Azure AD Conditional Access?",
+    "expected_sources": ["Azure Active Directory"],
+    "expected_provider": "azure",
+    "category": "security",
+    "reference_answer": "Conditional Access is an Azure AD feature that enforces access policies based on signals like user location, device compliance, and application sensitivity. It can require MFA or block access when risk is detected."
+  },
+  {
+    "id": "azure-vnet-1",
+    "question": "What is Azure Virtual Network and what can you connect with it?",
+    "expected_sources": ["Azure Virtual Network"],
+    "expected_provider": "azure",
+    "category": "networking",
+    "reference_answer": "Azure Virtual Network enables Azure resources to securely communicate with each other, the internet, and on-premises networks. You can connect VNets to each other via VNet peering or to on-premises via VPN Gateway."
+  },
+  {
+    "id": "azure-vnet-2",
+    "question": "What is an Azure Network Security Group?",
+    "expected_sources": ["Azure Virtual Network"],
+    "expected_provider": "azure",
+    "category": "networking",
+    "reference_answer": "A Network Security Group contains security rules that allow or deny inbound and outbound traffic to Azure resources. Rules are evaluated by priority and can filter traffic by IP, port, and protocol."
+  },
+  {
+    "id": "azure-functions-1",
+    "question": "What is Azure Functions and what trigger types does it support?",
+    "expected_sources": ["Azure Functions"],
+    "expected_provider": "azure",
+    "category": "compute",
+    "reference_answer": "Azure Functions is a serverless compute service that runs event-driven code. It supports triggers including HTTP requests, timers, blob storage events, queue messages, and Event Hub events."
+  },
+  {
+    "id": "azure-functions-2",
+    "question": "How does Azure Functions consumption plan billing work?",
+    "expected_sources": ["Azure Functions"],
+    "expected_provider": "azure",
+    "category": "compute",
+    "reference_answer": "The consumption plan charges based on the number of executions and resource consumption per execution. You are not charged when functions are idle, making it cost-effective for intermittent workloads."
+  },
+  {
+    "id": "cross-1",
+    "question": "What are the main differences between AWS Lambda and Azure Functions?",
+    "expected_sources": ["AWS Lambda", "Azure Functions"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both are serverless compute platforms that run event-driven code. AWS Lambda integrates natively with AWS services like S3 and DynamoDB. Azure Functions integrates with Azure services like Blob Storage and Event Hubs. Both support multiple languages and auto-scaling."
+  },
+  {
+    "id": "cross-2",
+    "question": "How does Amazon S3 compare to Azure Blob Storage for object storage?",
+    "expected_sources": ["Amazon S3", "Azure Storage"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "Both are scalable object storage services. S3 uses buckets and objects with storage classes like Standard, IA, and Glacier. Azure Blob Storage uses containers and blobs with Hot, Cool, and Archive tiers. Both offer high durability and global availability."
+  },
+  {
+    "id": "cross-3",
+    "question": "How do AWS IAM and Azure Active Directory compare for access control?",
+    "expected_sources": ["AWS Identity and Access Management", "Azure Active Directory"],
+    "expected_provider": null,
+    "category": "cross-provider",
+    "reference_answer": "AWS IAM focuses on controlling access to AWS resources through policies attached to users, groups, and roles. Azure AD is primarily an identity provider with SSO and MFA capabilities, complemented by Azure RBAC for resource access control."
+  }
+]

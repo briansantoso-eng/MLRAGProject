@@ -22,13 +22,28 @@ embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 groq_client = groq.Groq(api_key=GROQ_API_KEY)
 openai_client = openai.OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
+try:
+    _tiktoken_enc = tiktoken.encoding_for_model("gpt-3.5-turbo")
+except Exception:
+    _tiktoken_enc = None
+
+_chroma_collection = None
+
+def _get_collection():
+    global _chroma_collection
+    if _chroma_collection is None:
+        client = chromadb.PersistentClient(
+            path=CHROMA_DB_PATH,
+            settings=Settings(anonymized_telemetry=False)
+        )
+        _chroma_collection = client.get_collection(name=COLLECTION_NAME)
+    return _chroma_collection
+
 def count_tokens(text, model=LLM_MODEL):
     """Count tokens in text using tiktoken."""
-    try:
-        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
-        return len(encoding.encode(text))
-    except:
-        return len(text) // 4
+    if _tiktoken_enc:
+        return len(_tiktoken_enc.encode(text))
+    return len(text) // 4
 
 def retrieve_relevant_chunks(query, collection, provider_filter=None, top_k=TOP_K_RETRIEVAL):
     """Retrieve most relevant chunks for a query."""
@@ -116,11 +131,7 @@ def run_rag_query(query, provider_filter=None):
     if provider_filter:
         print(f"📋 Filtered to: {provider_filter.upper()} only")
 
-    chroma_client = chromadb.PersistentClient(
-        path=CHROMA_DB_PATH,
-        settings=Settings(anonymized_telemetry=False)
-    )
-    collection = chroma_client.get_collection(name=COLLECTION_NAME)
+    collection = _get_collection()
 
     print("\n📚 Retrieving relevant information...")
     retrieved_chunks, _ = retrieve_relevant_chunks(query, collection, provider_filter)

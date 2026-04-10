@@ -8,10 +8,9 @@ and splits content into meaningful chunks with metadata.
 import requests
 from bs4 import BeautifulSoup
 import json
-import time
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import DATA_SOURCES, CHUNK_SIZE, CHUNK_OVERLAP
-from urllib.parse import urljoin, urlparse
 
 def clean_html_text(html_content):
     """
@@ -134,22 +133,26 @@ def main():
     print("🚀 Starting document ingestion...")
     print(f"Target chunk size: {CHUNK_SIZE} chars, overlap: {CHUNK_OVERLAP} chars\n")
 
+    all_doc_configs = [
+        (provider, doc_config)
+        for provider, docs in DATA_SOURCES.items()
+        for doc_config in docs
+    ]
+
     all_documents = []
 
-    for provider, docs in DATA_SOURCES.items():
-        print(f"\n☁️  Processing {provider.upper()} documentation...")
-        for doc_config in docs:
-            doc = fetch_document(
-                doc_config["url"],
-                doc_config["title"],
-                doc_config["category"],
-                provider
-            )
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {
+            executor.submit(
+                fetch_document,
+                cfg["url"], cfg["title"], cfg["category"], provider
+            ): cfg["title"]
+            for provider, cfg in all_doc_configs
+        }
+        for future in as_completed(futures):
+            doc = future.result()
             if doc:
                 all_documents.append(doc)
-
-            # Be respectful to the servers
-            time.sleep(1)
 
     # Save the processed documents
     output_file = "processed_documents.json"

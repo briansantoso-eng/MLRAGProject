@@ -181,24 +181,33 @@ RESPONSE:"""
         Generate response using Groq (fast inference).
         """
         try:
-            response = groq_client.chat.completions.create(
-                model=LLM_MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=TEMPERATURE,
-                max_tokens=MAX_TOKENS
-            )
-            response_text = response.choices[0].message.content
-
             if not return_only and STREAMING_ENABLED:
-                # Simulate streaming by printing word by word
-                words = response_text.split()
-                for word in words:
-                    print(word + " ", end="", flush=True)
-                    import time
-                    time.sleep(0.05)  # Small delay to simulate streaming
-                print()  # New line at end
-            elif not return_only:
-                print(response_text)
+                stream = groq_client.chat.completions.create(
+                    model=LLM_MODEL,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=TEMPERATURE,
+                    max_tokens=MAX_TOKENS,
+                    stream=True
+                )
+                response_text = ""
+                for chunk in stream:
+                    if not chunk.choices:
+                        continue
+                    content = chunk.choices[0].delta.content
+                    if content is not None:
+                        print(content, end="", flush=True)
+                        response_text += content
+                print()
+            else:
+                response = groq_client.chat.completions.create(
+                    model=LLM_MODEL,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=TEMPERATURE,
+                    max_tokens=MAX_TOKENS
+                )
+                response_text = response.choices[0].message.content or ""
+                if not return_only:
+                    print(response_text)
 
             return response_text
 

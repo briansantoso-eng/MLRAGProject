@@ -9,12 +9,10 @@ import json
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
-import groq
 from config import (
-    GROQ_API_KEY, EMBEDDING_MODEL, EMBEDDING_DIMENSION,
+    EMBEDDING_MODEL, EMBEDDING_DIMENSION,
     CHROMA_DB_PATH, COLLECTION_NAME
 )
-import numpy as np
 import os
 
 # Initialize SentenceTransformer model (free, runs locally)
@@ -34,25 +32,6 @@ def get_embedding(text):
     except Exception as e:
         print(f"Error getting embedding: {e}")
         return None
-
-def cosine_similarity(vec1, vec2):
-    """
-    Calculate cosine similarity between two vectors.
-
-    CONCEPT: Cosine similarity measures the angle between vectors.
-    Values range from -1 (opposite) to 1 (identical).
-    For embeddings, higher values mean more similar content.
-
-    Formula: similarity = (A • B) / (|A| × |B|)
-    """
-    vec1 = np.array(vec1)
-    vec2 = np.array(vec2)
-
-    dot_product = np.dot(vec1, vec2)
-    norm1 = np.linalg.norm(vec1)
-    norm2 = np.linalg.norm(vec2)
-
-    return dot_product / (norm1 * norm2) if norm1 != 0 and norm2 != 0 else 0
 
 def initialize_chroma():
     """
@@ -122,7 +101,6 @@ def process_documents(documents_file="processed_documents.json"):
     # Process each document
     total_chunks = 0
     new_chunks = 0
-    embedding_cost = 0
 
     for doc in documents:
         doc_url = doc["url"]
@@ -135,25 +113,15 @@ def process_documents(documents_file="processed_documents.json"):
 
         print(f"🔄 Processing {doc['title']} ({doc['chunk_count']} chunks)")
 
-        # Process each chunk
-        for i, chunk in enumerate(doc["chunks"]):
-            # Get embedding
-            embedding = get_embedding(chunk)
+        chunk_texts = doc["chunks"]
+        embeddings = model.encode(chunk_texts, convert_to_numpy=True, batch_size=64, show_progress_bar=False)
 
-            if embedding is None:
-                print(f"  ❌ Failed to embed chunk {i+1}")
-                continue
-
-            # Calculate approximate cost (free for local embeddings)
-            # Just tracking token count for reference
-            token_estimate = len(chunk) * 0.02
-            embedding_cost += 0  # Free!
-
-            # Create unique ID for this chunk
-            chunk_id = f"{doc['provider']}_{doc['title'].replace(' ', '_')}_chunk_{i}"
-
-            # Prepare metadata
-            metadata = {
+        ids = [
+            f"{doc['provider']}_{doc['title'].replace(' ', '_')}_chunk_{i}"
+            for i in range(len(chunk_texts))
+        ]
+        metadatas = [
+            {
                 "url": doc["url"],
                 "title": doc["title"],
                 "provider": doc["provider"],
@@ -161,25 +129,24 @@ def process_documents(documents_file="processed_documents.json"):
                 "chunk_index": i,
                 "total_chunks": doc["chunk_count"]
             }
+            for i in range(len(chunk_texts))
+        ]
 
-            # Store in ChromaDB
-            collection.add(
-                ids=[chunk_id],
-                embeddings=[embedding],
-                metadatas=[metadata],
-                documents=[chunk]
-            )
+        collection.add(
+            ids=ids,
+            embeddings=embeddings.tolist(),
+            metadatas=metadatas,
+            documents=chunk_texts
+        )
 
-            new_chunks += 1
-            total_chunks += 1
-
-        print(f"  ✅ Added {doc['chunk_count']} chunks to database")
+        new_chunks += len(chunk_texts)
+        total_chunks += len(chunk_texts)
+        print(f"  ✅ Added {len(chunk_texts)} chunks to database")
 
     # Print summary
     print("\n✅ Embedding complete!")
     print(f"📦 Total chunks in database: {total_chunks}")
     print(f"🆕 New chunks added: {new_chunks}")
-    print(f"💰 Estimated embedding cost: ${embedding_cost:.4f}")
     print(f"💾 Database saved to: {CHROMA_DB_PATH}")
 
     # Show database stats

@@ -19,9 +19,13 @@ A retrieval-augmented generation system built on real AWS, Azure, and GCP docume
 3. Retrieves relevant passages on query
 4. Generates grounded answers via Groq
 
-## Evaluation
+## Evaluation Framework
 
-Measured on a 27-question eval set covering all providers and categories using `step5_evaluate.py`.
+To move beyond "it seems to work", a ground-truth evaluation set was built and three metrics were measured.
+
+**What this shows:** `eval_dataset.json` contains 27 questions across 18 source documents (AWS, Azure, GCP) plus 3 cross-provider comparisons. Each question has a known expected source, enabling automated scoring without human review. Three metrics are tracked: **Recall@K** (did the right document appear in top-K?), **MRR@K** (how highly ranked was it?), and **LLM-as-judge Faithfulness** (does the generated answer stay grounded in retrieved context, scored 1–5 by a second Groq call?).
+
+Baseline results at k=5 using `step5_evaluate.py`:
 
 | Metric | Score |
 | --- | --- |

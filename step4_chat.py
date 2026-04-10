@@ -10,6 +10,7 @@ from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 import groq
 import tiktoken
+from provider_detector import detect_provider
 from config import (
     GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL, TEMPERATURE, MAX_TOKENS,
     CHROMA_DB_PATH, COLLECTION_NAME, TOP_K_RETRIEVAL, MAX_CONVERSATION_HISTORY,
@@ -221,6 +222,10 @@ RESPONSE:"""
         """
         Process a single chat message.
         """
+        # Auto-detect provider if not explicitly set
+        if provider_filter is None:
+            provider_filter = detect_provider(user_query)
+
         # Rewrite query for context
         rewritten_query = self.rewrite_query(user_query)
 
@@ -295,6 +300,10 @@ RESPONSE:"""
         """
         Get response for web interface (returns string instead of printing).
         """
+        # Auto-detect provider if not explicitly set
+        if provider_filter is None:
+            provider_filter = detect_provider(user_query)
+
         # Rewrite query for context
         rewritten_query = self.rewrite_query(user_query)
 

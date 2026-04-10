@@ -1,0 +1,30 @@
+{
+  "MiniLM (current)": {
+    "k3": {
+      "recall": 0.6296,
+      "mrr": 0.6111,
+      "hits": 17,
+      "total": 27
+    },
+    "k5": {
+      "recall": 0.6296,
+      "mrr": 0.6111,
+      "hits": 17,
+      "total": 27
+    }
+  },
+  "BGE (new)": {
+    "k3": {
+      "recall": 0.6296,
+      "mrr": 0.6111,
+      "hits": 17,
+      "total": 27
+    },
+    "k5": {
+      "recall": 0.6296,
+      "mrr": 0.6111,
+      "hits": 17,
+      "total": 27
+    }
+  }
+}

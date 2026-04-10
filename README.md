@@ -186,9 +186,26 @@ Every AWS query retrieved Lambda because it was the only AWS document that exist
 
 Recall went from 0.630 to 1.000. Auto provider detection pushed MRR from 0.975 to 1.000 — the correct document is now always ranked first.
 
-**Corpus balance after fix:** AWS 99 chunks, GCP 27, Azure 17. The scraped AWS pages returned significantly more content. This does not affect eval accuracy (questions explicitly name services) but would bias real-world ambiguous queries toward AWS results.
+**Final corpus after balancing:** AWS 44, GCP 27, Azure 17 — capped at 8 chunks per document via `MAX_CHUNKS_PER_DOC` in config. Final eval: Recall@3 = 1.000, MRR@3 = 1.000.
 
 ![Provider Detection Chart](eval/provider_detection_chart.png)
+
+---
+
+## Mistakes made and what they revealed
+
+A full log of every error made during development — what was wrong, why it happened, and what it taught.
+
+| # | Mistake | What actually happened | Fix |
+| --- | --- | --- | --- |
+| 1 | Predicted BGE would improve recall | BGE scored identically to MiniLM (Recall=0.630 both). The problem was not model size — cloud services are semantically equivalent across providers by definition | Ran the experiment instead of assuming; confirmed the bottleneck was elsewhere |
+| 2 | Predicted BM25 hybrid search would improve recall | BM25 made recall worse at k=3 (0.518 vs 0.630). Cloud docs use identical vocabulary across providers so BM25 scores them all equally, adding noise | Measured the result honestly; ruled out keyword frequency as the fix |
+| 3 | Predicted provider metadata filtering would improve recall | Detection was 100% accurate but recall didn't move. All 10 misses were AWS queries returning Lambda — even within AWS-only results | Forced inspection of individual misses, which revealed the real problem |
+| 4 | AWS documentation URLs pointed to index pages | `docs.aws.amazon.com/s3/index.html` returns 21 chars (a JavaScript SPA shell). S3, EC2, RDS, IAM, VPC all had 0 chunks. Every AWS query retrieved Lambda because it was the only AWS doc that existed | Replaced all 5 broken URLs with direct content page URLs; corpus grew from 50 to 143 chunks |
+| 5 | `step2_embed_store.py` called `initialize_chroma()` twice | `main()` ran `process_documents()` (builds collection), then immediately called `initialize_chroma()` again which deleted and recreated the collection — wiping all data silently. Collection always showed 0 chunks after embed | Made `process_documents()` return the collection; `main()` reuses it instead of reinitializing |
+| 6 | Corpus imbalance after URL fix | S3 returned 41 chunks, RDS 25 — while Azure Storage had 2. AWS dominated 99/143 chunks, which would bias retrieval for ambiguous real-world queries | Added `MAX_CHUNKS_PER_DOC = 8` cap in config; corpus balanced to AWS 44, GCP 27, Azure 17 |
+
+**The core lesson:** three retrieval algorithm experiments (BGE, BM25, provider detection) all failed because the data was broken, not the algorithms. Debugging retrieval quality problems by inspecting individual misses — not just aggregate metrics — is what revealed the root cause.
 
 ---
 

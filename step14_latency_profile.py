@@ -30,15 +30,11 @@ import time
 import argparse
 import random
 import statistics
-import chromadb
 import groq
-from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
-from config import (
-    GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL,
-    CHROMA_DB_PATH, COLLECTION_NAME
-)
+from config import GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL
+from rag_utils import get_collection
 
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 cross_encoder   = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
@@ -82,22 +78,14 @@ def _t():
     return time.perf_counter() * 1000
 
 
-def get_collection():
-    client = chromadb.PersistentClient(
-        path=CHROMA_DB_PATH,
-        settings=Settings(anonymized_telemetry=False)
-    )
-    return client.get_collection(name=COLLECTION_NAME)
-
-
 def _groq_call_timed(messages, temperature, max_tokens, max_retries=5):
     """Call Groq, return (response, wall_ms, server_ms, input_tokens, output_tokens)."""
-    delay = 6
+    delay    = 6
     last_exc: Exception = RuntimeError("max_retries must be > 0")
     for attempt in range(max_retries):
         t0 = _t()
         try:
-            resp = groq_client.chat.completions.create(
+            resp    = groq_client.chat.completions.create(
                 model=LLM_MODEL,
                 messages=messages,
                 temperature=temperature,
@@ -128,8 +116,8 @@ def _groq_call_timed(messages, temperature, max_tokens, max_retries=5):
 
 
 def profile_dense(question: str, collection, k: int = 3) -> dict:
-    timings: dict = {}
-    total_in_tokens = 0
+    timings: dict    = {}
+    total_in_tokens  = 0
     total_out_tokens = 0
 
     t0 = _t()
@@ -157,11 +145,11 @@ def profile_dense(question: str, collection, k: int = 3) -> dict:
     total_in_tokens  += in_tok
     total_out_tokens += out_tok
 
-    timings["total_ms"]        = sum(v for k2, v in timings.items()
-                                     if k2.endswith("_ms") and "server" not in k2)
-    timings["input_tokens"]    = total_in_tokens
-    timings["output_tokens"]   = total_out_tokens
-    timings["est_cost_usd"]    = (
+    timings["total_ms"]     = sum(v for k2, v in timings.items()
+                                  if k2.endswith("_ms") and "server" not in k2)
+    timings["input_tokens"]  = total_in_tokens
+    timings["output_tokens"] = total_out_tokens
+    timings["est_cost_usd"]  = (
         total_in_tokens  / 1_000_000 * COST_PER_1M_INPUT_TOKENS +
         total_out_tokens / 1_000_000 * COST_PER_1M_OUTPUT_TOKENS
     )
@@ -169,8 +157,8 @@ def profile_dense(question: str, collection, k: int = 3) -> dict:
 
 
 def profile_hyde(question: str, collection, k: int = 3) -> dict:
-    timings: dict = {}
-    total_in_tokens = 0
+    timings: dict    = {}
+    total_in_tokens  = 0
     total_out_tokens = 0
 
     resp, wall_ms, server_ms, in_tok, out_tok = _groq_call_timed(
@@ -209,11 +197,11 @@ def profile_hyde(question: str, collection, k: int = 3) -> dict:
     total_in_tokens  += in_tok
     total_out_tokens += out_tok
 
-    timings["total_ms"]        = sum(v for k2, v in timings.items()
-                                     if k2.endswith("_ms") and "server" not in k2)
-    timings["input_tokens"]    = total_in_tokens
-    timings["output_tokens"]   = total_out_tokens
-    timings["est_cost_usd"]    = (
+    timings["total_ms"]      = sum(v for k2, v in timings.items()
+                                   if k2.endswith("_ms") and "server" not in k2)
+    timings["input_tokens"]  = total_in_tokens
+    timings["output_tokens"] = total_out_tokens
+    timings["est_cost_usd"]  = (
         total_in_tokens  / 1_000_000 * COST_PER_1M_INPUT_TOKENS +
         total_out_tokens / 1_000_000 * COST_PER_1M_OUTPUT_TOKENS
     )
@@ -222,8 +210,8 @@ def profile_hyde(question: str, collection, k: int = 3) -> dict:
 
 def profile_multiquery(question: str, collection,
                        k_per: int = 6, final_k: int = 3) -> dict:
-    timings: dict = {}
-    total_in_tokens = 0
+    timings: dict    = {}
+    total_in_tokens  = 0
     total_out_tokens = 0
 
     resp, wall_ms, server_ms, in_tok, out_tok = _groq_call_timed(
@@ -244,17 +232,19 @@ def profile_multiquery(question: str, collection,
     except (json.JSONDecodeError, ValueError):
         queries = [question] * 3
 
+    # Batch-encode all reformulations in a single forward pass
+    t0               = _t()
+    query_embeddings = embedding_model.encode(
+        queries, convert_to_numpy=True, batch_size=len(queries)
+    )
+    timings["embed_ms"] = _t() - t0
+
     candidates: dict[str, dict] = {}
     total_vector_ms = 0.0
-    total_embed_ms  = 0.0
-    for q in queries:
-        t0 = _t()
-        q_emb = embedding_model.encode(q, convert_to_numpy=True).tolist()
-        total_embed_ms += _t() - t0
-
+    for q_emb in query_embeddings:
         t0 = _t()
         results = collection.query(
-            query_embeddings=[q_emb],
+            query_embeddings=[q_emb.tolist()],
             n_results=k_per,
             include=["documents", "metadatas"]
         )
@@ -265,12 +255,11 @@ def profile_multiquery(question: str, collection,
                 candidates[doc] = {"title": meta["title"], "doc": doc, "hit_count": 0}
             candidates[doc]["hit_count"] += 1
 
-    timings["embed_ms"]  = total_embed_ms
     timings["vector_ms"] = total_vector_ms
 
     pool  = list(candidates.values())
     pairs = [(question, c["doc"]) for c in pool]
-    t0 = _t()
+    t0    = _t()
     ce_scores = cross_encoder.predict(pairs)
     timings["rerank_ms"] = _t() - t0
 
@@ -289,11 +278,11 @@ def profile_multiquery(question: str, collection,
     total_in_tokens  += in_tok
     total_out_tokens += out_tok
 
-    timings["total_ms"]        = sum(v for k2, v in timings.items()
-                                     if k2.endswith("_ms") and "server" not in k2)
-    timings["input_tokens"]    = total_in_tokens
-    timings["output_tokens"]   = total_out_tokens
-    timings["est_cost_usd"]    = (
+    timings["total_ms"]      = sum(v for k2, v in timings.items()
+                                   if k2.endswith("_ms") and "server" not in k2)
+    timings["input_tokens"]  = total_in_tokens
+    timings["output_tokens"] = total_out_tokens
+    timings["est_cost_usd"]  = (
         total_in_tokens  / 1_000_000 * COST_PER_1M_INPUT_TOKENS +
         total_out_tokens / 1_000_000 * COST_PER_1M_OUTPUT_TOKENS
     )
@@ -312,7 +301,7 @@ def run_profile(eval_path="eval_dataset.json", n: int = 15,
         dataset = json.load(f)
 
     random.seed(42)
-    sample = random.sample(dataset, min(n, len(dataset)))
+    sample     = random.sample(dataset, min(n, len(dataset)))
     collection = get_collection()
 
     if methods is None:
@@ -337,7 +326,7 @@ def run_profile(eval_path="eval_dataset.json", n: int = 15,
 
         for i, item in enumerate(sample):
             question = item["question"]
-            t = profile_fn[method](question, collection)
+            t        = profile_fn[method](question, collection)
             timings_list.append(t)
             total = t["total_ms"]
             print(f"  {i+1:>2}/{len(sample)}  total={total:6.0f}ms", end="\r")
@@ -350,8 +339,8 @@ def run_profile(eval_path="eval_dataset.json", n: int = 15,
             vals = [t[stage] for t in timings_list if t.get(stage) is not None]
             if vals:
                 stats[stage] = {
-                    "p50": round(statistics.median(vals), 1),
-                    "p95": round(percentile(vals, 95), 1),
+                    "p50":  round(statistics.median(vals), 1),
+                    "p95":  round(percentile(vals, 95), 1),
                     "mean": round(sum(vals) / len(vals), 1),
                 }
 
@@ -411,9 +400,9 @@ def run_profile(eval_path="eval_dataset.json", n: int = 15,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--n",      type=int,   default=15,
+    parser.add_argument("--n",      type=int, default=15,
                         help="Number of questions to profile (default 15)")
-    parser.add_argument("--method", type=str,   default=None,
+    parser.add_argument("--method", type=str, default=None,
                         help="Comma-separated methods: dense,hyde,multiquery")
     parser.add_argument("--eval-path", default="eval_dataset.json")
     args = parser.parse_args()

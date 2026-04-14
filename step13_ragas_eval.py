@@ -30,22 +30,15 @@ Usage:
 """
 
 import json
-import time
 import argparse
 import random
-import chromadb
-import groq
-from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 
-from config import (
-    GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL,
-    CHROMA_DB_PATH, COLLECTION_NAME
-)
-from step12_multiquery import retrieve_multiquery, generate_reformulations
+from config import EMBEDDING_MODEL, LLM_MODEL
+from rag_utils import get_collection, groq_call, generate_answer
+from step12_multiquery import retrieve_multiquery
 
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
-groq_client     = groq.Groq(api_key=GROQ_API_KEY)
 
 # ── Prompts ───────────────────────────────────────────────────────────────────
 
@@ -86,47 +79,10 @@ Score from 0.0 to 1.0:
 
 Respond ONLY with a float between 0.0 and 1.0."""
 
-GENERATION_PROMPT = """\
-Answer the following question using ONLY the provided context. Be concise.
-
-CONTEXT:
-{context}
-
-QUESTION: {question}
-
-Answer:"""
-
-
-def get_collection():
-    client = chromadb.PersistentClient(
-        path=CHROMA_DB_PATH,
-        settings=Settings(anonymized_telemetry=False)
-    )
-    return client.get_collection(name=COLLECTION_NAME)
-
-
-def _groq_call_with_retry(messages, temperature, max_tokens, max_retries=5):
-    delay = 6
-    last_exc: Exception = RuntimeError("max_retries must be > 0")
-    for attempt in range(max_retries):
-        try:
-            return groq_client.chat.completions.create(
-                model=LLM_MODEL,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens
-            )
-        except groq.RateLimitError as exc:
-            last_exc = exc
-            if attempt < max_retries - 1:
-                time.sleep(delay)
-                delay = min(delay * 2, 60)
-    raise last_exc
-
 
 def retrieve_dense(question: str, collection, k: int = 3):
     """Standard dense retrieval for comparison."""
-    q_emb = embedding_model.encode(question, convert_to_numpy=True).tolist()
+    q_emb   = embedding_model.encode(question, convert_to_numpy=True).tolist()
     results = collection.query(
         query_embeddings=[q_emb],
         n_results=k,
@@ -154,16 +110,6 @@ def retrieve_hyde(question: str, collection, k: int = 3):
     return titles, docs, context
 
 
-def generate_answer(question: str, context: str) -> str:
-    response = _groq_call_with_retry(
-        messages=[{"role": "user", "content": GENERATION_PROMPT.format(
-            context=context, question=question)}],
-        temperature=0.1,
-        max_tokens=400,
-    )
-    return response.choices[0].message.content or ""
-
-
 # ── RAGAS metrics ─────────────────────────────────────────────────────────────
 
 def score_context_precision(question: str, docs: list[str]) -> float | None:
@@ -171,14 +117,14 @@ def score_context_precision(question: str, docs: list[str]) -> float | None:
     chunks_text = "\n\n".join(
         f"Chunk {i+1}: {doc[:400]}" for i, doc in enumerate(docs)
     )
-    prompt = CONTEXT_PRECISION_PROMPT.format(question=question, chunks=chunks_text)
-    response = _groq_call_with_retry(
+    prompt   = CONTEXT_PRECISION_PROMPT.format(question=question, chunks=chunks_text)
+    response = groq_call(
         messages=[{"role": "user", "content": prompt}],
         temperature=0.0,
         max_tokens=40,
     )
     try:
-        labels = json.loads(response.choices[0].message.content.strip())
+        labels    = json.loads(response.choices[0].message.content.strip())
         yes_count = sum(1 for l in labels if str(l).upper() == "YES")
         return round(yes_count / len(labels), 4) if labels else None
     except (json.JSONDecodeError, ValueError, ZeroDivisionError):
@@ -187,12 +133,12 @@ def score_context_precision(question: str, docs: list[str]) -> float | None:
 
 def score_context_recall(question: str, reference_answer: str, context: str) -> float | None:
     """Fraction of reference answer claims supported by retrieved context."""
-    prompt = CONTEXT_RECALL_PROMPT.format(
+    prompt   = CONTEXT_RECALL_PROMPT.format(
         question=question,
         reference_answer=reference_answer,
         context=context[:3000]
     )
-    response = _groq_call_with_retry(
+    response = groq_call(
         messages=[{"role": "user", "content": prompt}],
         temperature=0.0,
         max_tokens=40,
@@ -204,14 +150,15 @@ def score_context_recall(question: str, reference_answer: str, context: str) -> 
         return None
 
 
-def score_answer_correctness(question: str, reference_answer: str, generated_answer: str) -> float | None:
+def score_answer_correctness(question: str, reference_answer: str,
+                             generated_answer: str) -> float | None:
     """Agreement between generated answer and reference on key facts."""
-    prompt = ANSWER_CORRECTNESS_PROMPT.format(
+    prompt   = ANSWER_CORRECTNESS_PROMPT.format(
         question=question,
         reference_answer=reference_answer,
         generated_answer=generated_answer
     )
-    response = _groq_call_with_retry(
+    response = groq_call(
         messages=[{"role": "user", "content": prompt}],
         temperature=0.0,
         max_tokens=10,
@@ -269,14 +216,14 @@ def run_evaluation(eval_path="eval_dataset.json", method="multiquery",
         if ac is not None: scores["answer_correctness"].append(ac)
 
         result = {
-            "id":                  item["id"],
-            "question":            question,
-            "category":            item.get("category"),
-            "retrieved_titles":    titles,
-            "generated_answer":    answer,
-            "context_precision":   cp,
-            "context_recall":      cr,
-            "answer_correctness":  ac,
+            "id":                 item["id"],
+            "question":           question,
+            "category":           item.get("category"),
+            "retrieved_titles":   titles,
+            "generated_answer":   answer,
+            "context_precision":  cp,
+            "context_recall":     cr,
+            "answer_correctness": ac,
         }
         results.append(result)
 
@@ -296,15 +243,15 @@ def run_evaluation(eval_path="eval_dataset.json", method="multiquery",
     print(f"  Context Precision:  {avg(scores['context_precision']):.3f}")
     print(f"  Context Recall:     {avg(scores['context_recall']):.3f}")
     print(f"  Answer Correctness: {avg(scores['answer_correctness']):.3f}")
-    print(f"\n  Context Precision: what fraction of retrieved chunks were necessary")
-    print(f"  Context Recall:    what fraction of the reference answer was covered")
+    print(f"\n  Context Precision:  what fraction of retrieved chunks were necessary")
+    print(f"  Context Recall:     what fraction of the reference answer was covered")
     print(f"  Answer Correctness: factual agreement with reference answer")
     print(f"\n  Limitation: judge = generator ({LLM_MODEL}) — may score itself generously")
 
     output = {
-        "method": method,
-        "n": len(dataset),
-        "judge_model": LLM_MODEL,
+        "method":           method,
+        "n":                len(dataset),
+        "judge_model":      LLM_MODEL,
         "judge_limitation": "same model as generator — may not reliably detect own hallucinations",
         "summary": {
             "context_precision":  avg(scores["context_precision"]),

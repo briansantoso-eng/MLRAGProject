@@ -28,21 +28,16 @@ Usage:
 """
 
 import json
-import time
 import argparse
-import chromadb
-import groq
-from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
-from config import (
-    GROQ_API_KEY, EMBEDDING_MODEL, LLM_MODEL,
-    CHROMA_DB_PATH, COLLECTION_NAME
+from config import EMBEDDING_MODEL
+from rag_utils import (
+    get_collection, groq_call, generate_answer, score_faithfulness, check_hit
 )
 
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 cross_encoder   = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-groq_client     = groq.Groq(api_key=GROQ_API_KEY)
 
 N_REFORMULATIONS = 3   # query variations to generate
 K_PER_QUERY      = 6   # candidates per reformulation (union = up to 18)
@@ -72,37 +67,10 @@ FAILURE_TAXONOMY = {
 }
 
 
-def get_collection():
-    client = chromadb.PersistentClient(
-        path=CHROMA_DB_PATH,
-        settings=Settings(anonymized_telemetry=False)
-    )
-    return client.get_collection(name=COLLECTION_NAME)
-
-
-def _groq_call_with_retry(messages, temperature, max_tokens, max_retries=5):
-    delay = 6
-    last_exc: Exception = RuntimeError("max_retries must be > 0")
-    for attempt in range(max_retries):
-        try:
-            return groq_client.chat.completions.create(
-                model=LLM_MODEL,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens
-            )
-        except groq.RateLimitError as exc:
-            last_exc = exc
-            if attempt < max_retries - 1:
-                time.sleep(delay)
-                delay = min(delay * 2, 60)
-    raise last_exc
-
-
 def generate_reformulations(question: str, n: int = N_REFORMULATIONS) -> list[str]:
     """Ask the LLM to rephrase the query N ways with different vocabulary."""
     prompt = REFORMULATION_PROMPT.format(n=n, question=question)
-    response = _groq_call_with_retry(
+    response = groq_call(
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,   # slight diversity
         max_tokens=200,
@@ -122,20 +90,25 @@ def retrieve_multiquery(question: str, collection, k_per: int = K_PER_QUERY,
                         final_k: int = FINAL_K):
     """
     1. Generate N reformulations of the question.
-    2. Retrieve k_per candidates per reformulation via bi-encoder.
-    3. Union all candidates, deduplicate by document text, track
+    2. Batch-encode all reformulations in a single forward pass.
+    3. Retrieve k_per candidates per reformulation via bi-encoder.
+    4. Union all candidates, deduplicate by document text, track
        how many reformulations retrieved each chunk (retrieval confidence).
-    4. Re-rank the union against the ORIGINAL question using cross-encoder.
-    5. Return top final_k.
+    5. Re-rank the union against the ORIGINAL question using cross-encoder.
+    6. Return top final_k.
     """
     queries = generate_reformulations(question)
 
+    # Batch-encode all reformulations in a single forward pass
+    query_embeddings = embedding_model.encode(
+        queries, convert_to_numpy=True, batch_size=len(queries)
+    )
+
     # Union candidates: doc_text -> {title, doc, hit_count}
     candidates: dict[str, dict] = {}
-    for q in queries:
-        q_emb = embedding_model.encode(q, convert_to_numpy=True).tolist()
+    for q_emb in query_embeddings:
         results = collection.query(
-            query_embeddings=[q_emb],
+            query_embeddings=[q_emb.tolist()],
             n_results=k_per,
             include=["documents", "metadatas"]
         )
@@ -145,58 +118,17 @@ def retrieve_multiquery(question: str, collection, k_per: int = K_PER_QUERY,
             candidates[doc]["hit_count"] += 1
 
     # Re-rank the union against the ORIGINAL query
-    pool       = list(candidates.values())
-    pairs      = [(question, c["doc"]) for c in pool]
-    ce_scores  = cross_encoder.predict(pairs)
+    pool      = list(candidates.values())
+    pairs     = [(question, c["doc"]) for c in pool]
+    ce_scores = cross_encoder.predict(pairs)
 
-    ranked = sorted(
-        zip(ce_scores, pool),
-        key=lambda x: x[0],
-        reverse=True
-    )
-    top = ranked[:final_k]
+    ranked = sorted(zip(ce_scores, pool), key=lambda x: x[0], reverse=True)
+    top    = ranked[:final_k]
 
     top_titles  = [c["title"] for _, c in top]
     top_context = "\n\n".join(c["doc"] for _, c in top)
     top_conf    = [c["hit_count"] for _, c in top]  # retrieval confidence per doc
     return top_titles, top_context, queries, top_conf
-
-
-def check_hit(retrieved_titles, expected_sources):
-    for i, title in enumerate(retrieved_titles):
-        if any(exp in title for exp in expected_sources):
-            return True, i + 1
-    return False, None
-
-
-def generate_answer(question, context):
-    prompt = (
-        "Answer the following question using ONLY the provided context. Be concise.\n\n"
-        f"CONTEXT:\n{context}\n\nQUESTION: {question}\n\nAnswer:"
-    )
-    response = _groq_call_with_retry(
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.1,
-        max_tokens=400,
-    )
-    return response.choices[0].message.content or ""
-
-
-def score_faithfulness(question, context, answer):
-    prompt = (
-        "You are an evaluation judge. Score whether the answer is grounded in the context.\n\n"
-        f"QUESTION: {question}\n\nCONTEXT:\n{context[:2000]}\n\nANSWER:\n{answer}\n\n"
-        "Score 1-5 (5=fully grounded). Respond with ONLY a single integer."
-    )
-    response = _groq_call_with_retry(
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.0,
-        max_tokens=5,
-    )
-    try:
-        return max(1, min(5, int(response.choices[0].message.content.strip())))
-    except (ValueError, AttributeError):
-        return None
 
 
 def run_evaluation(eval_path="eval_dataset.json", score_answers=True):
@@ -205,9 +137,9 @@ def run_evaluation(eval_path="eval_dataset.json", score_answers=True):
 
     collection = get_collection()
     hits = 0
-    reciprocal_ranks = []
-    faith_scores = []
-    results = []
+    reciprocal_ranks: list[float] = []
+    faith_scores: list[int] = []
+    results: list[dict] = []
 
     print(f"Multi-query retrieval — {len(dataset)} questions  "
           f"(reformulations={N_REFORMULATIONS}, k_per={K_PER_QUERY}, "
@@ -231,23 +163,23 @@ def run_evaluation(eval_path="eval_dataset.json", score_answers=True):
             reciprocal_ranks.append(0.0)
 
         result = {
-            "id":               item["id"],
-            "question":         question,
-            "category":         item.get("category"),
-            "expected_sources": expected_sources,
-            "retrieved_titles": titles,
+            "id":                   item["id"],
+            "question":             question,
+            "category":             item.get("category"),
+            "expected_sources":     expected_sources,
+            "retrieved_titles":     titles,
             "retrieval_confidence": confidences,
-            "reformulations":   reformulations,
-            "hit":              hit,
-            "rank":             rank,
-            "miss_reason":      FAILURE_TAXONOMY.get(item["id"]) if not hit else None,
+            "reformulations":       reformulations,
+            "hit":                  hit,
+            "rank":                 rank,
+            "miss_reason":          FAILURE_TAXONOMY.get(item["id"]) if not hit else None,
         }
 
         faith_score = None
         if score_answers:
-            answer = generate_answer(question, context)
+            answer      = generate_answer(question, context)
             faith_score = score_faithfulness(question, context, answer)
-            result["answer"]      = answer
+            result["answer"]       = answer
             result["faithfulness"] = faith_score
             if faith_score is not None:
                 faith_scores.append(faith_score)
@@ -285,7 +217,7 @@ def run_evaluation(eval_path="eval_dataset.json", score_answers=True):
 
     print("\nRetrieval by category:")
     for cat, stats in sorted(categories.items()):
-        pct = stats["hits"] / stats["total"]
+        pct       = stats["hits"] / stats["total"]
         faith_avg = (
             f"  faith={sum(stats['faith'])/len(stats['faith']):.1f}"
             if stats["faith"] else ""
@@ -312,12 +244,12 @@ def run_evaluation(eval_path="eval_dataset.json", score_answers=True):
             print(f"  {reason:<20} {count} miss(es)")
 
     output = {
-        "method":             "multi-query reformulation + cross-encoder re-ranking",
-        "n_reformulations":   N_REFORMULATIONS,
+        "method":              "multi-query reformulation + cross-encoder re-ranking",
+        "n_reformulations":    N_REFORMULATIONS,
         "k_per_reformulation": K_PER_QUERY,
-        "final_k":            FINAL_K,
+        "final_k":             FINAL_K,
         "summary": {
-            "n": n,
+            "n":                    n,
             f"recall_at_{FINAL_K}": round(recall, 4),
             f"mrr_at_{FINAL_K}":    round(mrr, 4),
             "avg_faithfulness":     round(avg_faith, 2) if avg_faith else None,

@@ -187,6 +187,22 @@ HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall fr
 
 ---
 
+## Why this branch exists
+
+At the end of step 6, the system had Recall=0.952. It worked. But "it works" is not the bar for a senior ML engineer role — and that was the target.
+
+The gap between a junior build and a senior one isn't the algorithm. It's the thinking around it. A junior engineer ships when the demo passes. A senior engineer asks three harder questions before calling it done:
+
+1. **Does it fail gracefully when my assumptions break?** — Multi-query reformulation was an attempt to push recall past 0.952 by approaching every query from multiple vocabulary angles. The honest result was a regression. Reporting that honestly, and diagnosing *why*, is more valuable than cherry-picking the method that scored best.
+
+2. **Do I actually know what quality looks like end-to-end?** — Recall@K tells you whether the right document was retrieved, not whether the generated answer was correct. RAGAS is the industry standard for measuring end-to-end RAG quality: context precision, recall, and answer correctness independently. Running it revealed that retrieval is broad but noisy — the right chunk is almost always in the top 3, but so are 2 irrelevant ones. That's useful signal for a production system and invisible in the earlier metrics.
+
+3. **Would this survive real traffic?** — Every technique that improves recall adds latency. HyDE adds one LLM round-trip. Multi-query adds one plus 3× embedding work plus a reranking pass. Before recommending a method for production, you need to know what each improvement actually costs — in milliseconds and dollars, not just in recall points.
+
+The three additions in this branch — multi-query, RAGAS, latency profiling — are not about chasing a higher number. They're about demonstrating the habits that make a system trustworthy enough to deploy and defend in a design review.
+
+---
+
 ### 7. Multi-query reformulation — and an honest regression
 
 The 3 remaining HyDE misses share a root cause: the original query vocabulary doesn't surface the right document, and HyDE's single hypothetical answer drifts toward the wrong service type. If one hypothetical is unreliable, the fix is to generate *multiple* reformulations — each approaching the concept from a different angle — retrieve k=6 candidates per reformulation, union-pool all results, and re-rank the full union against the original query with a cross-encoder.

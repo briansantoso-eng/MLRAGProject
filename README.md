@@ -10,8 +10,6 @@ When you ask an AI a cloud infrastructure question, it often sounds right but is
 
 The goal: build a system that finds the right documentation passage before generating an answer, so the AI is constrained to what the docs actually say — not what it guesses.
 
-![RAG Chat Screenshot](ss/ss1.png)
-
 ---
 
 ## How I solved it

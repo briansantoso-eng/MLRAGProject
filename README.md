@@ -231,6 +231,7 @@ HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall fr
 | `automatic-provider-detection` | Provider classifier (100% accurate), corpus URL fix, eval hardening |
 | `harder-evals-model-improvement` | Expands eval set to 62 questions (explicit, implicit, hard) to expose genuine retrieval failures — Recall drops to 0.919, identifying security and networking in plain English as the next improvement target |
 | `hyde-rerank-improvement` | HyDE and cross-encoder re-ranking experiments to recover the 5 hard-eval misses — HyDE alone is the best result: Recall 0.919 → 0.952, MRR 0.812 → 0.860 |
+| `senior-ml-improvements` | Multi-query reformulation, RAGAS evaluation, per-stage latency profiling — targets the production-readiness gap between a working prototype and a deployable system |
 
 ---
 

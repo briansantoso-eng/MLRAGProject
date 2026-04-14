@@ -187,6 +187,81 @@ HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall fr
 
 ---
 
+### 7. Multi-query reformulation — and an honest regression
+
+The 3 remaining HyDE misses share a root cause: the original query vocabulary doesn't surface the right document, and HyDE's single hypothetical answer drifts toward the wrong service type. If one hypothetical is unreliable, the fix is to generate *multiple* reformulations — each approaching the concept from a different angle — retrieve k=6 candidates per reformulation, union-pool all results, and re-rank the full union against the original query with a cross-encoder.
+
+For the Lambda/VPC miss, the hypothesis was that one reformulation ("Lambda VPC subnet security group RDS") would surface the VPC chunk that the original query never surfaced.
+
+**Result: Recall=0.903, MRR=0.833 — a regression from HyDE's 0.952.**
+
+| Method | Recall@3 | MRR@3 | Notes |
+| --- | --- | --- | --- |
+| HyDE (best single method) | 0.952 | 0.860 | 3 remaining misses |
+| **Multi-query reformulation** | **0.903** | **0.833** | Fixed 1, introduced 2 new misses |
+
+Multi-query fixed `hard-failure-003` (junior developer deleted the database — the semantic drift miss), but introduced 2 new misses on GCP equivalence questions ("What is Google Cloud's equivalent of an Amazon EC2 instance?" and "What does GCP call the mechanism for defining which actions are allowed?"). Post-hoc analysis: those questions need exact terminology matching that query reformulation obscures by generating vocabulary-diverse alternatives. HyDE's single focused pass works better for cross-vocabulary equivalence queries.
+
+**What this demonstrates:** adding complexity — 3 LLM calls for reformulation + 3× embedding work + cross-encoder re-ranking — does not guarantee improvement. The correct conclusion is not "use more techniques" but "understand your failure modes and match the technique to the cause." Multi-query fits multi-hop and vocabulary-drift problems; it doesn't fit cross-vocabulary equivalence problems where direct semantic matching is already close to correct.
+
+The 3 Lambda/VPC-class misses persist across all methods. They require multi-hop reasoning (answer is in a *different* service's docs) that single-chunk retrieval cannot solve without a knowledge graph or multi-step reasoning chain.
+
+---
+
+### 8. RAGAS evaluation — measuring answer quality, not just retrieval
+
+All previous metrics (Recall@K, MRR@K, Faithfulness 1–5) measure retrieval hit or crude grounding. RAGAS is the industry-standard framework for measuring end-to-end RAG quality with three independent dimensions:
+
+- **Context Precision** — what fraction of retrieved chunks were *necessary* to answer the question? Measures retrieval noise. 1.0 = zero irrelevant chunks retrieved.
+- **Context Recall** — what fraction of the reference answer's facts were covered by the retrieved context? Measures retrieval coverage.
+- **Answer Correctness** — does the generated answer agree with a reference answer on key facts? Measures end-to-end quality.
+
+Results on a 10-question random sample using HyDE retrieval (best method):
+
+| Metric | Score | Interpretation |
+| --- | --- | --- |
+| Context Precision | **0.300** | Only 1 of 3 retrieved chunks was necessary — noisy retrieval |
+| Context Recall | **0.823** | Retrieved context covered 82% of reference answer facts |
+| Answer Correctness | **0.520** | Partial factual agreement (self-judging inflates this) |
+
+The low Context Precision (0.300) and high Context Recall (0.823) tell a clear story: retrieval is broad but not focused. The system finds what it needs, but also pulls in 2 irrelevant chunks for every 1 useful one. This is expected at k=3 in a 143-chunk corpus where many documents cover related topics across providers — narrowing k further would drop recall. In production, metadata filtering by provider and category would improve precision without sacrificing recall.
+
+**Known limitation:** the same Llama 3.1 8B model is used as both the generator and the judge. A model cannot reliably detect its own hallucinations. In production, a separate judge model (e.g., GPT-4o) or a trained reward model would be used. This is documented explicitly in `step13_ragas_eval.py`.
+
+---
+
+### 9. Latency profiling — measuring production viability
+
+Every retrieval improvement adds latency overhead. HyDE adds one LLM call (hypothetical generation) before the embedding. Multi-query adds one LLM call plus 3× the embedding and vector query work plus a cross-encoder pass over a larger candidate pool. These are significant costs at production scale.
+
+`step14_latency_profile.py` measures P50 and P95 wall-clock time per stage across all methods (8-question sample):
+
+| Stage | Dense | HyDE | Multi-query |
+| --- | --- | --- | --- |
+| Embedding | 17ms / 54ms | 22ms / 50ms | 35ms / 65ms |
+| Vector search | 3ms / 116ms | 2ms / 2ms | 7ms / 10ms |
+| HyDE generation | — | 829ms / 1,234ms | — |
+| Query reformulation | — | — | 1,124ms / 2,215ms |
+| Cross-encoder rerank | — | — | 386ms / 749ms |
+| Answer generation | 124ms / 358ms | 7,665ms / 8,606ms | 6,663ms / 7,203ms |
+| **Total** | **143ms / 534ms** | **8,381ms / 9,421ms** | **8,674ms / 10,135ms** |
+
+Format: P50 / P95
+
+The answer generation numbers for HyDE and multi-query are inflated by Groq rate limiting (dense ran first and consumed most of the per-minute token budget). Under sustained traffic where all methods see equal rate pressure, the real cold-start advantage of dense is its **fewer API round-trips** — 1 LLM call vs 2 for HyDE vs 2 for multi-query plus 3× embedding + reranking. In a production environment with no rate limits (paid tier or self-hosted), expected P50 values would be: dense ~200ms, HyDE ~800ms–1,200ms, multi-query ~1,500ms–2,000ms.
+
+**Cost per query (Groq Llama 3.1 8B, mean over 8 questions):**
+
+| Method | Cost |
+| --- | --- |
+| Dense | $0.0000331 |
+| HyDE | $0.0000466 |
+| Multi-query | $0.0000427 |
+
+At 10,000 queries/day: under $0.50/day for any method. Cost is not the constraint — latency and rate limits are.
+
+---
+
 ## NLP techniques used
 
 | Category | Technique |
@@ -195,12 +270,16 @@ HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall fr
 | | BM25 keyword retrieval (term frequency) |
 | | Hybrid search — Reciprocal Rank Fusion (RRF) |
 | | HyDE — Hypothetical Document Embeddings |
-| | Cross-encoder re-ranking |
-| **Embeddings** | Bi-encoder comparison: MiniLM vs BGE (model size vs retrieval quality) |
+| | Cross-encoder re-ranking (two-stage: bi-encoder candidate pool → cross-encoder scorer) |
+| | Multi-query reformulation — union pooling with retrieval confidence scoring |
+| **Embeddings** | Bi-encoder comparison: MiniLM vs BGE (model size vs retrieval quality tradeoff) |
 | **Evaluation** | Recall@K, MRR@K |
 | | LLM-as-judge faithfulness scoring (1–5) |
 | | Eval hardening — 3 difficulty tiers (explicit → implicit → hard) |
+| | RAGAS-style evaluation: Context Precision, Context Recall, Answer Correctness |
+| | Failure taxonomy (multi_hop, semantic_drift, no_keyword, cross_vocabulary) |
 | **Hyperparameter tuning** | K-sweep (k=1,3,5,10), recall-faithfulness tradeoff analysis |
+| | Per-stage latency profiling (P50/P95) across retrieval methods |
 | **Query understanding** | Pronoun resolution via conversation history |
 | | Keyword-based provider classification |
 
@@ -217,6 +296,8 @@ HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall fr
 | 5 | `step2_embed_store.py` called `initialize_chroma()` twice | Second call silently deleted the freshly-written collection; always verify collection count after embedding |
 | 6 | Corpus imbalance after URL fix | S3: 41 chunks, Azure Storage: 2 — added `MAX_CHUNKS_PER_DOC = 8` cap to balance cross-provider retrieval |
 | 7 | Eval set was too easy | Recall=1.000 on name-match questions is not a signal; eval sets need to reflect real query patterns |
+| 8 | Multi-query reformulation regressed vs HyDE | Adding complexity (3× LLM + embedding + cross-encoder) doesn't help if the root cause is cross-vocabulary equivalence, not vocabulary drift. Match technique to failure mode. |
+| 9 | Ran RAGAS and latency profiler in parallel | Both compete for the same Groq TPM budget — concurrent LLM-heavy evals cause cascading rate limit retries. Run sequentially. |
 
 ---
 
@@ -231,6 +312,7 @@ HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall fr
 | `automatic-provider-detection` | Provider classifier (100% accurate), corpus URL fix, eval hardening |
 | `harder-evals-model-improvement` | Expands eval set to 62 questions (explicit, implicit, hard) to expose genuine retrieval failures — Recall drops to 0.919, identifying security and networking in plain English as the next improvement target |
 | `hyde-rerank-improvement` | HyDE and cross-encoder re-ranking experiments to recover the 5 hard-eval misses — HyDE alone is the best result: Recall 0.919 → 0.952, MRR 0.812 → 0.860 |
+| `senior-ml-improvements` | Multi-query reformulation, RAGAS evaluation framework, per-stage latency profiling — includes honest regression (multi-query worse than HyDE on cross-vocabulary queries) and failure taxonomy |
 
 ---
 

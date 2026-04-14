@@ -1,0 +1,1004 @@
+{
+  "method": "cross-encoder re-ranking",
+  "candidate_k": 10,
+  "final_k": 3,
+  "summary": {
+    "n": 62,
+    "recall_at_3": 0.9194,
+    "mrr_at_3": 0.828,
+    "avg_faithfulness": null
+  },
+  "per_category": {
+    "compute": {
+      "recall": 0.9333,
+      "avg_faithfulness": null
+    },
+    "storage": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    },
+    "database": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    },
+    "security": {
+      "recall": 0.7273,
+      "avg_faithfulness": null
+    },
+    "networking": {
+      "recall": 0.8889,
+      "avg_faithfulness": null
+    },
+    "cross-provider": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    }
+  },
+  "results": [
+    {
+      "id": "aws-lambda-1",
+      "question": "What is AWS Lambda and what is it used for?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-lambda-2",
+      "question": "How does AWS Lambda scale automatically?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-s3-1",
+      "question": "What is Amazon S3 and what kind of data can you store in it?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-s3-2",
+      "question": "What are S3 storage classes and when would you use each?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-ec2-1",
+      "question": "What is Amazon EC2 and how does it differ from serverless computing?",
+      "category": "compute",
+      "expected_sources": [
+        "Amazon EC2"
+      ],
+      "retrieved_titles": [
+        "Amazon EC2",
+        "Amazon RDS",
+        "Amazon EC2"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-ec2-2",
+      "question": "What are EC2 instance types and how do you choose the right one?",
+      "category": "compute",
+      "expected_sources": [
+        "Amazon EC2"
+      ],
+      "retrieved_titles": [
+        "Amazon EC2",
+        "Amazon EC2",
+        "Amazon EC2"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-rds-1",
+      "question": "What database engines does Amazon RDS support?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-rds-2",
+      "question": "What is RDS Multi-AZ deployment and why would you use it?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-iam-1",
+      "question": "What is AWS IAM and what problems does it solve?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-iam-2",
+      "question": "What is the difference between an IAM role and an IAM user?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-vpc-1",
+      "question": "What is Amazon VPC and why is it important for cloud networking?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "GCP VPC"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-vpc-2",
+      "question": "What is a VPC subnet and what is the difference between public and private subnets?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vm-1",
+      "question": "What are Azure Virtual Machines and what workloads are they suited for?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Virtual Machines"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Machines",
+        "Azure Storage",
+        "Azure Virtual Network"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vm-2",
+      "question": "What is an Azure availability set and how does it improve reliability?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Virtual Machines"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Network",
+        "Azure Virtual Machines",
+        "Azure Storage"
+      ],
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "azure-storage-1",
+      "question": "What types of storage does Azure Storage provide?",
+      "category": "storage",
+      "expected_sources": [
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Azure Storage",
+        "Azure Storage",
+        "Azure Virtual Machines"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-storage-2",
+      "question": "What are the Azure Blob Storage access tiers?",
+      "category": "storage",
+      "expected_sources": [
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Azure Storage",
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-sql-1",
+      "question": "What is Azure SQL Database and how is it different from SQL Server on a VM?",
+      "category": "database",
+      "expected_sources": [
+        "Azure SQL Database"
+      ],
+      "retrieved_titles": [
+        "Azure SQL Database",
+        "Azure SQL Database",
+        "Azure SQL Database"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-sql-2",
+      "question": "What is an Azure SQL Database elastic pool?",
+      "category": "database",
+      "expected_sources": [
+        "Azure SQL Database"
+      ],
+      "retrieved_titles": [
+        "Azure SQL Database",
+        "Azure SQL Database",
+        "Azure Storage"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-ad-1",
+      "question": "What is Azure Active Directory and how is it used for identity management?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "Azure Active Directory",
+        "Azure Active Directory",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-ad-2",
+      "question": "What is Azure AD Conditional Access?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "Azure Active Directory",
+        "Azure Active Directory",
+        "Azure Active Directory"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vnet-1",
+      "question": "What is Azure Virtual Network and what can you connect with it?",
+      "category": "networking",
+      "expected_sources": [
+        "Azure Virtual Network"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Network",
+        "Azure Virtual Network",
+        "Azure Virtual Machines"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vnet-2",
+      "question": "What is an Azure Network Security Group?",
+      "category": "networking",
+      "expected_sources": [
+        "Azure Virtual Network"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Network",
+        "Azure Virtual Network",
+        "Azure Virtual Network"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-functions-1",
+      "question": "What is Azure Functions and what trigger types does it support?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "Azure Functions",
+        "Azure Storage"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-functions-2",
+      "question": "How does Azure Functions consumption plan billing work?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "Azure Virtual Network",
+        "Azure Active Directory"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "cross-1",
+      "question": "What are the main differences between AWS Lambda and Azure Functions?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "cross-2",
+      "question": "How does Amazon S3 compare to Azure Blob Storage for object storage?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "cross-3",
+      "question": "How do AWS IAM and Azure Active Directory compare for access control?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "Amazon S3",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-aws-compute-1",
+      "question": "In AWS, how do I run event-driven code in response to a file upload without managing any servers?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-aws-storage-1",
+      "question": "In AWS, how do I host a static website directly from object storage?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon EC2",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "implicit-aws-security-1",
+      "question": "In AWS, how do I grant one service permission to call another service without storing credentials in code?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-aws-networking-1",
+      "question": "In AWS, how do I make sure my database server is not directly reachable from the internet?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-azure-compute-1",
+      "question": "In Azure, how do I run code triggered by an HTTP request without provisioning or managing a server?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-azure-security-1",
+      "question": "In Azure, how do I enforce two-factor authentication for all users in my organization?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "Azure Active Directory",
+        "Azure Active Directory",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-gcp-database-1",
+      "question": "In Google Cloud, what managed service should I use if I need to run a MySQL or PostgreSQL database?",
+      "category": "database",
+      "expected_sources": [
+        "GCP Cloud SQL"
+      ],
+      "retrieved_titles": [
+        "GCP Cloud SQL",
+        "GCP Cloud SQL",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-gcp-networking-1",
+      "question": "In Google Cloud, how do I create an isolated private network for my resources?",
+      "category": "networking",
+      "expected_sources": [
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "GCP VPC",
+        "Amazon VPC"
+      ],
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-any-vm-1",
+      "question": "How do I rent a virtual machine in the cloud where I have full control over the operating system?",
+      "category": "compute",
+      "expected_sources": [
+        "Amazon EC2",
+        "Azure Virtual Machines",
+        "GCP Compute"
+      ],
+      "retrieved_titles": [
+        "GCP VPC",
+        "Azure Virtual Machines",
+        "Azure Virtual Machines"
+      ],
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-any-serverless-1",
+      "question": "What is the cheapest way to run short background tasks without paying for idle server time?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions",
+        "GCP Cloud Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "GCP Cloud Functions",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-object-storage-1",
+      "question": "How do I store large files like images and videos durably and cheaply in the cloud?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "GCP Storage",
+        "Azure Storage",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-db-failover-1",
+      "question": "How do I set up automatic failover so my relational database keeps serving traffic if one availability zone fails?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS",
+        "Azure SQL Database",
+        "GCP Cloud SQL"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-iam-1",
+      "question": "How do I control which users and services are allowed to access specific cloud resources?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-any-private-network-1",
+      "question": "How do I connect my cloud environment to my office network so internal traffic never crosses the public internet?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC",
+        "Azure Virtual Network",
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-cold-storage-1",
+      "question": "How do I archive old application logs to reduce storage costs while keeping them recoverable?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-serverless-1",
+      "question": "Which has better support for running serverless event-driven workloads \u00e2\u20ac\u201d AWS or Azure?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "Azure Functions",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-networking-1",
+      "question": "Compare how AWS and Google Cloud isolate and segment network traffic between workloads.",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon VPC",
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon VPC",
+        "GCP VPC"
+      ],
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-cross-database-1",
+      "question": "How do the managed database services in AWS and Azure handle backups and point-in-time recovery?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon RDS",
+        "Azure SQL Database"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon EC2"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-identity-1",
+      "question": "How do the identity and access management approaches differ between Google Cloud and Microsoft Azure?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "GCP IAM",
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "GCP IAM",
+        "Azure Active Directory",
+        "Azure Active Directory"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-storage-cost-1",
+      "question": "How do AWS and Azure handle cost optimization for storing data that is rarely accessed?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Azure Storage",
+        "AWS Identity and Access Management"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-biz-001",
+      "question": "We need a cheap and durable place to store millions of small customer photos that our web app serves to users globally.",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "GCP Storage",
+        "Azure Storage"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-biz-002",
+      "question": "Our confirmation email handler runs for 200ms and fires about 50 times a day. We want to pay only when it actually executes, not for idle time.",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions",
+        "GCP Cloud Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Lambda"
+      ],
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "hard-biz-003",
+      "question": "How do I make sure a developer can push code to production but cannot drop or modify the production database schema?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Azure SQL Database",
+        "Amazon RDS"
+      ],
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-biz-004",
+      "question": "My web servers need to serve internet traffic, but my database servers should have no inbound or outbound internet access at all.",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC",
+        "Azure Virtual Network",
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon VPC",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "hard-biz-005",
+      "question": "Our database becomes unavailable for several minutes every time AWS patches the underlying hardware. How do we eliminate that downtime?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "AWS Identity and Access Management",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-equiv-001",
+      "question": "What is Google Cloud's equivalent of an Amazon EC2 instance?",
+      "category": "compute",
+      "expected_sources": [
+        "GCP Compute"
+      ],
+      "retrieved_titles": [
+        "Amazon EC2",
+        "GCP VPC",
+        "GCP Storage"
+      ],
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-equiv-002",
+      "question": "What does Microsoft Azure call its serverless code execution service, the equivalent of AWS Lambda?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "hard-equiv-003",
+      "question": "What is the AWS service for storing files and objects that is equivalent to Azure Blob Storage?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Azure Storage",
+        "Azure Storage",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "hard-equiv-004",
+      "question": "What does AWS call its managed relational database service, the equivalent of Azure SQL Database?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Azure SQL Database"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-equiv-005",
+      "question": "What is the Azure service that plays the same role as AWS IAM for controlling who can access cloud resources?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "Amazon S3",
+        "AWS Identity and Access Management"
+      ],
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-failure-001",
+      "question": "My AWS Lambda function times out every time it tries to connect to my RDS database. The function works fine connecting to external APIs. What is likely misconfigured?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-failure-002",
+      "question": "We left our storage bucket publicly readable by accident and 10TB of data was downloaded overnight, costing us thousands of dollars. What controls should have been in place?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "GCP Storage",
+        "Amazon S3"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-failure-003",
+      "question": "A junior developer deleted the production database because they had the same admin permissions as the database team. What access control change would have prevented this?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "GCP IAM",
+        "Amazon RDS"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-term-001",
+      "question": "What is the difference between a bucket in AWS and a container in Azure when storing files in the cloud?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Azure Storage",
+        "Amazon S3",
+        "GCP Storage"
+      ],
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-term-002",
+      "question": "What does GCP call the mechanism for defining which actions a service account is allowed to perform, similar to an AWS IAM policy?",
+      "category": "security",
+      "expected_sources": [
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hit": false,
+      "rank": null
+    }
+  ]
+}

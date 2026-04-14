@@ -160,6 +160,33 @@ Recall=1.000 looked perfect — but every one of the 27 questions explicitly nam
 
 ---
 
+### 6. Push recall further — HyDE and re-ranking
+
+After the honest 62-question eval exposed 5 genuine misses in security and networking, three approaches were tested to recover them.
+
+**The problem:** queries like "a junior developer shouldn't be able to delete the database" contain zero IAM keywords. The bi-encoder embeds the plain English and finds no match in the IAM chunks, which are full of "policies", "roles", "least privilege".
+
+**HyDE (Hypothetical Document Embeddings):** instead of embedding the raw query, ask the LLM to generate a short hypothetical answer first — then embed that. The generated text naturally contains "IAM policy", "least privilege", "roles and permissions" because the LLM knows those are the right terms. That embedding retrieves the correct chunk.
+
+**Cross-encoder re-ranking:** retrieve 10 candidates with the bi-encoder, then score each (query, document) pair with a cross-encoder that reads both together. More accurate than cosine similarity alone.
+
+**Combined (HyDE + re-ranking):** use HyDE for the retrieval embedding, then re-rank the candidates with the cross-encoder.
+
+| Method | Recall@3 | MRR@3 | Misses fixed |
+| --- | --- | --- | --- |
+| Baseline (dense only) | 0.919 | 0.812 | — |
+| Re-ranking only | 0.919 | 0.828 | +2 fixed, -1 new |
+| HyDE + Re-ranking | 0.919 | 0.841 | +3 fixed, -2 new |
+| **HyDE only** | **0.952** | **0.860** | **+2 fixed, 0 new** |
+
+HyDE alone is the best result. Re-ranking hurt when combined with HyDE because the cross-encoder scores against the *original* plain-English query — it demotes documents that HyDE correctly surfaced via the hypothetical.
+
+![Improvement Chart](eval/improvement_chart.png)
+
+HyDE recovers 2 of the 5 misses with no regressions elsewhere, pushing Recall from 0.919 to 0.952 and MRR from 0.812 to 0.860. Three misses remain — all require multi-hop reasoning (Lambda timeout → missing VPC config) that goes beyond single-chunk retrieval.
+
+---
+
 ## NLP techniques used
 
 | Category | Technique |
@@ -167,6 +194,8 @@ Recall=1.000 looked perfect — but every one of the 27 questions explicitly nam
 | **Retrieval** | Dense vector search (cosine similarity) |
 | | BM25 keyword retrieval (term frequency) |
 | | Hybrid search — Reciprocal Rank Fusion (RRF) |
+| | HyDE — Hypothetical Document Embeddings |
+| | Cross-encoder re-ranking |
 | **Embeddings** | Bi-encoder comparison: MiniLM vs BGE (model size vs retrieval quality) |
 | **Evaluation** | Recall@K, MRR@K |
 | | LLM-as-judge faithfulness scoring (1–5) |
@@ -201,6 +230,7 @@ Recall=1.000 looked perfect — but every one of the 27 questions explicitly nam
 | `ML-fine-tuning-hybrid-search-embedding-model` | BGE embedding swap and BM25 hybrid — both tested honestly |
 | `automatic-provider-detection` | Provider classifier (100% accurate), corpus URL fix, eval hardening |
 | `harder-evals-model-improvement` | Expands eval set to 62 questions (explicit, implicit, hard) to expose genuine retrieval failures — Recall drops to 0.919, identifying security and networking in plain English as the next improvement target |
+| `hyde-rerank-improvement` | HyDE and cross-encoder re-ranking experiments to recover the 5 hard-eval misses — HyDE alone is the best result: Recall 0.919 → 0.952, MRR 0.812 → 0.860 |
 
 ---
 

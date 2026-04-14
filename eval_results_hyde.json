@@ -1,0 +1,1064 @@
+{
+  "method": "HyDE",
+  "summary": {
+    "n": 62,
+    "recall_at_3": 0.9516,
+    "mrr_at_3": 0.8602,
+    "avg_faithfulness": null
+  },
+  "per_category": {
+    "compute": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    },
+    "storage": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    },
+    "database": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    },
+    "security": {
+      "recall": 0.8182,
+      "avg_faithfulness": null
+    },
+    "networking": {
+      "recall": 0.8889,
+      "avg_faithfulness": null
+    },
+    "cross-provider": {
+      "recall": 1.0,
+      "avg_faithfulness": null
+    }
+  },
+  "results": [
+    {
+      "id": "aws-lambda-1",
+      "question": "What is AWS Lambda and what is it used for?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "AWS Lambda is a serverless compute service that allows users to run code without provisioning or managing servers, leveraging event-driven architecture and automatic scaling to handle variable workloads. It integrates seamlessly with other AWS services, such as Amazon API Gateway, Amazon S3, and Amazon DynamoDB, to process events and trigger functions in response to changes or updates. By utilizing AWS Lambda, developers can build scalable, event-driven applications that reduce costs and improve efficiency.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-lambda-2",
+      "question": "How does AWS Lambda scale automatically?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "AWS Lambda scales automatically based on incoming event traffic, utilizing a feature known as provisioned concurrency, which allows users to reserve a specific number of instances to handle consistent workloads. Additionally, Lambda's auto-scaling functionality, powered by Amazon CloudWatch and Amazon DynamoDB, continuously monitors and adjusts the number of instances to meet changing demand, ensuring optimal performance and cost efficiency. This dynamic scaling enables Lambda functions to handle sudden spikes in traffic without manual intervention.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-s3-1",
+      "question": "What is Amazon S3 and what kind of data can you store in it?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "Amazon S3 (Simple Storage Service) is a highly durable and scalable object storage service that allows users to store and retrieve large amounts of unstructured data, such as images, videos, and documents, in a secure and redundant manner. S3 supports a wide range of data types, including binary data, text files, and metadata, and provides features like versioning, lifecycle management, and access control through IAM policies. By utilizing S3 buckets and objects, users can efficiently manage and distribute their data across the globe, leveraging the service's high availability and performance.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-s3-2",
+      "question": "What are S3 storage classes and when would you use each?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "Amazon S3 provides a range of storage classes to optimize cost and performance for different use cases. The Standard storage class is suitable for frequently accessed data, such as websites and mobile apps, while the Infrequent Access (IA) storage class is ideal for less frequently accessed data, like backups and archives. Additionally, the One Zone-IA storage class offers a lower cost option for data stored in a single Availability Zone, making it suitable for applications that can tolerate data loss in the event of a Zone outage.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-ec2-1",
+      "question": "What is Amazon EC2 and how does it differ from serverless computing?",
+      "category": "compute",
+      "expected_sources": [
+        "Amazon EC2"
+      ],
+      "retrieved_titles": [
+        "Amazon EC2",
+        "Amazon RDS",
+        "Amazon EC2"
+      ],
+      "hypothetical_answer": "Amazon EC2 is a web service that provides resizable compute capacity in the cloud, allowing users to run a wide range of operating systems, including Windows, Linux, and Unix, on virtual machines (VMs) within Amazon Virtual Private Cloud (VPC) environments. Unlike serverless computing services such as AWS Lambda, which execute code in response to events without provisioning or managing servers, EC2 provides a managed virtualization platform that enables users to provision, manage, and scale their own VMs to run applications and workloads. This allows for greater control and flexibility over compute resources, but also requires users",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-ec2-2",
+      "question": "What are EC2 instance types and how do you choose the right one?",
+      "category": "compute",
+      "expected_sources": [
+        "Amazon EC2"
+      ],
+      "retrieved_titles": [
+        "Amazon EC2",
+        "Amazon EC2",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "When selecting an Amazon EC2 instance type, users must consider factors such as compute power, memory, and storage requirements, as well as the desired instance family (e.g., General Purpose, Compute Optimized, Memory Optimized, Storage Optimized) to ensure optimal performance and cost efficiency. For instance, the c5.xlarge instance type, which belongs to the Compute Optimized family, offers 2 vCPUs, 4 GB of memory, and 30 GB of SSD storage, making it suitable for applications that require high CPU performance. Conversely, the r5.xlarge instance type,",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-rds-1",
+      "question": "What database engines does Amazon RDS support?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "Amazon RDS supports a variety of database engines, including MySQL, PostgreSQL, Oracle, SQL Server, and Amazon Aurora, which is a MySQL and PostgreSQL-compatible database engine that can be used to create high-performance databases with automatic storage and scaling. Additionally, Amazon RDS also supports Amazon DocumentDB, a document-oriented database service that is compatible with MongoDB. These database engines can be deployed on various instance types and storage options, including General Purpose (SSD), Provisioned IOPS (SSD), and Magnetic storage.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-rds-2",
+      "question": "What is RDS Multi-AZ deployment and why would you use it?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "In Amazon Web Services (AWS), RDS Multi-AZ deployment is a high availability feature that automatically replicates your database instance across multiple Availability Zones (AZs) within a single region, providing a redundant and fault-tolerant database environment. This deployment type ensures that your database remains accessible and minimizes downtime in the event of a zone failure or maintenance, while also providing read replicas for improved performance and scalability. By using RDS Multi-AZ, you can ensure high availability and business continuity for your database workloads.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-iam-1",
+      "question": "What is AWS IAM and what problems does it solve?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "AWS IAM (Identity and Access Management) is a web service that enables you to securely control access to AWS resources and services by managing users, groups, roles, and permissions. By using IAM, you can solve problems such as identity sprawl, permission creep, and unauthorized access to sensitive resources, thereby improving the overall security and compliance posture of your AWS environment. IAM integrates with other AWS services, including AWS STS (Security Token Service) and AWS Cognito, to provide a comprehensive identity and access management solution.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-iam-2",
+      "question": "What is the difference between an IAM role and an IAM user?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "In Amazon Web Services (AWS), an IAM role is a set of permissions that can be assumed by an entity, such as an EC2 instance or a Lambda function, to perform specific actions on AWS resources, whereas an IAM user is a unique identity that can be used to access AWS services, with its own set of permissions and credentials. IAM roles are designed to be assumed by services, whereas IAM users are typically used by humans to access AWS services. This distinction allows for more secure and fine-grained access control in AWS.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-vpc-1",
+      "question": "What is Amazon VPC and why is it important for cloud networking?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
+      ],
+      "hypothetical_answer": "Amazon VPC (Virtual Private Cloud) is a virtual networking environment within the Amazon Web Services (AWS) cloud that allows users to create a logically isolated section of the AWS cloud, providing a secure and customizable network infrastructure for their resources. By utilizing Amazon VPC, users can define their own IP address ranges, subnets, and network access controls, enabling them to segregate their resources and maintain a high level of security and compliance. This isolation is crucial for cloud networking, as it enables users to deploy resources in a secure and isolated environment, reducing the risk of unauthorized access and data breaches.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "aws-vpc-2",
+      "question": "What is a VPC subnet and what is the difference between public and private subnets?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
+      ],
+      "hypothetical_answer": "In Amazon Web Services (AWS), a Virtual Private Cloud (VPC) subnet is a range of IP addresses within a VPC that defines a network segment for a group of resources, such as instances and network interfaces. Public subnets are used to connect to the internet and are associated with a route table that includes a route to an internet gateway (IGW), while private subnets are isolated from the internet and are associated with a route table that does not include a route to an IGW, providing an additional layer of security and isolation for sensitive resources. This separation enables secure communication between public-facing",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vm-1",
+      "question": "What are Azure Virtual Machines and what workloads are they suited for?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Virtual Machines"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Machines",
+        "Azure Virtual Machines",
+        "Azure Virtual Network"
+      ],
+      "hypothetical_answer": "Azure Virtual Machines (VMs) are a type of Infrastructure as a Service (IaaS) offering in Azure, allowing customers to deploy and manage virtualized computing resources, such as Windows and Linux instances, on-demand. These VMs can be configured with various sizes, networking options, and storage types, making them suitable for a wide range of workloads, including enterprise applications, big data analytics, and high-performance computing (HPC) workloads that require high CPU, memory, and storage resources. By leveraging Azure VMs, customers can quickly scale and deploy applications, such as web servers,",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vm-2",
+      "question": "What is an Azure availability set and how does it improve reliability?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Virtual Machines"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Machines",
+        "Azure Virtual Machines",
+        "Azure Virtual Network"
+      ],
+      "hypothetical_answer": "An Azure availability set is a logical grouping of virtual machines (VMs) that enables improved reliability and high availability by distributing VMs across multiple fault domains and update domains within a virtual network. By doing so, Azure ensures that VMs within the same availability set are not co-located on the same physical hardware, reducing the risk of correlated failures and improving overall system resilience. This allows customers to deploy mission-critical workloads, such as databases and web servers, with confidence in their ability to withstand planned and unplanned outages.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-storage-1",
+      "question": "What types of storage does Azure Storage provide?",
+      "category": "storage",
+      "expected_sources": [
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Azure Storage",
+        "GCP Storage",
+        "Azure Storage"
+      ],
+      "hypothetical_answer": "Azure Storage offers a range of storage solutions, including Blob Storage, which provides object storage for unstructured data such as images, videos, and documents, and File Storage, which offers a file system experience for storing and sharing files. Additionally, Azure Storage provides Queue Storage for message queuing and Table Storage for structured data storage, all of which can be accessed through the Azure Storage REST API or Azure SDKs. These storage options are highly scalable and durable, with features such as data redundancy and geo-redundancy.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-storage-2",
+      "question": "What are the Azure Blob Storage access tiers?",
+      "category": "storage",
+      "expected_sources": [
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Azure Storage",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "Azure Blob Storage offers three access tiers to optimize data storage and retrieval costs: Hot, Cool, and Archive. The Hot tier is designed for frequently accessed data, providing low latency and high throughput, while the Cool tier is suitable for less frequently accessed data, offering a balance between cost and performance. The Archive tier is intended for infrequently accessed data, providing the lowest storage costs but with longer retrieval times.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-sql-1",
+      "question": "What is Azure SQL Database and how is it different from SQL Server on a VM?",
+      "category": "database",
+      "expected_sources": [
+        "Azure SQL Database"
+      ],
+      "retrieved_titles": [
+        "Azure SQL Database",
+        "Azure SQL Database",
+        "Azure SQL Database"
+      ],
+      "hypothetical_answer": "Azure SQL Database is a fully managed, cloud-based relational database service that provides a scalable and highly available platform for deploying and managing SQL Server databases. Unlike SQL Server on a Virtual Machine (VM), which requires manual provisioning and management of underlying infrastructure, Azure SQL Database offers a serverless architecture that automatically scales to meet changing workloads, eliminating the need for database administrators to manage storage, compute resources, and backups. This allows developers to focus on application development and deployment, while Azure SQL Database handles the underlying database management tasks.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-sql-2",
+      "question": "What is an Azure SQL Database elastic pool?",
+      "category": "database",
+      "expected_sources": [
+        "Azure SQL Database"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Azure SQL Database"
+      ],
+      "hypothetical_answer": "An Azure SQL Database elastic pool is a resource that allows you to group multiple databases under a single pool, enabling you to manage and optimize database performance, scalability, and cost across multiple databases. Elastic pools provide a flexible and cost-effective way to manage databases with varying workloads, by allocating a shared set of resources, such as vCores and storage, across the databases in the pool. This allows you to scale up or down as needed, without having to provision individual databases with dedicated resources.",
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "azure-ad-1",
+      "question": "What is Azure Active Directory and how is it used for identity management?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "Azure Active Directory",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "hypothetical_answer": "Azure Active Directory (Azure AD) is a cloud-based identity and access management service that provides a centralized platform for managing user identities, groups, and applications across multiple Azure services, including Azure Storage, Azure Virtual Machines, and Azure Kubernetes Service (AKS). Azure AD uses industry-standard protocols such as OAuth 2.0, OpenID Connect, and SAML 2.0 to authenticate and authorize users, enabling secure access to cloud-based resources and applications, including Microsoft 365 and Azure AD-protected web applications. By integrating with Azure AD, organizations can leverage its features, such as multi-factor",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-ad-2",
+      "question": "What is Azure AD Conditional Access?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "Azure Active Directory",
+        "Azure Active Directory",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "Azure AD Conditional Access is a cloud-based security feature that enforces access policies on Azure Active Directory (Azure AD) users and devices, allowing administrators to grant or deny access to Azure AD resources based on conditions such as location, device platform, and user risk level. This feature integrates with Azure AD Identity Protection and Azure Information Protection to provide a comprehensive security solution. By configuring Conditional Access policies, administrators can ensure that only compliant devices and users can access sensitive Azure AD resources, such as Microsoft 365 and Azure resources.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vnet-1",
+      "question": "What is Azure Virtual Network and what can you connect with it?",
+      "category": "networking",
+      "expected_sources": [
+        "Azure Virtual Network"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Network",
+        "Azure Virtual Network",
+        "Azure Virtual Machines"
+      ],
+      "hypothetical_answer": "Azure Virtual Network (VNet) is a virtualized network infrastructure that enables users to create and manage virtual networks in the cloud, providing a secure and isolated environment for resources such as virtual machines (VMs), load balancers, and application gateways. VNets can be connected to on-premises networks using Azure Virtual Network Gateways, allowing for hybrid connectivity and seamless communication between cloud and on-premises resources. Additionally, VNets can be connected to Azure services such as Azure Storage, Azure Database, and Azure Active Directory (Azure AD) for secure and scalable data storage and authentication.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-vnet-2",
+      "question": "What is an Azure Network Security Group?",
+      "category": "networking",
+      "expected_sources": [
+        "Azure Virtual Network"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Network",
+        "Azure Virtual Network",
+        "Azure Virtual Network"
+      ],
+      "hypothetical_answer": "An Azure Network Security Group (NSG) is a cloud-based network security service that filters incoming and outgoing network traffic to and from Azure resources, such as virtual machines and load balancers, based on defined security rules. NSGs are implemented at the subnet or network interface level and can be used to control traffic flow, block malicious traffic, and enforce network policies in Azure Virtual Networks (VNETs). By configuring NSGs, users can create a secure and isolated network environment for their Azure resources.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-functions-1",
+      "question": "What is Azure Functions and what trigger types does it support?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "Azure Storage",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "Azure Functions is a fully managed, event-driven serverless compute service that allows developers to build scalable and highly available applications by processing events from various sources, such as Azure Storage queues, Azure Cosmos DB, and HTTP requests. It supports a wide range of trigger types, including HTTP triggers, Timer triggers, Azure Blob Storage triggers, Azure Queue Storage triggers, Azure Service Bus triggers, and Cosmos DB triggers, among others. By leveraging these triggers, developers can create event-driven applications that respond to real-time events and data changes.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "azure-functions-2",
+      "question": "How does Azure Functions consumption plan billing work?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Virtual Machines",
+        "Azure Functions",
+        "Amazon EC2"
+      ],
+      "hypothetical_answer": "In Azure Functions, the consumption plan is a serverless offering that bills based on the number of executions, with each execution counted as a single invocation. The billing is calculated based on the number of executions, memory used, and duration of each execution, with a minimum allocation of 100 MB of memory per instance. This plan is ideal for applications with variable or unpredictable workloads, as it eliminates the need for upfront resource provisioning and scaling.",
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "cross-1",
+      "question": "What are the main differences between AWS Lambda and Azure Functions?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "hypothetical_answer": "AWS Lambda and Azure Functions are both event-driven serverless compute services that enable developers to run code without provisioning or managing servers. However, AWS Lambda supports AWS X-Ray for distributed tracing and AWS IAM roles for fine-grained access control, whereas Azure Functions relies on Azure Monitor for logging and Azure Active Directory (AAD) for authentication and authorization. Additionally, AWS Lambda has a more extensive integration with other AWS services, such as Amazon S3 and Amazon DynamoDB, compared to Azure Functions' integration with Azure Storage and Azure Cosmos DB.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "cross-2",
+      "question": "How does Amazon S3 compare to Azure Blob Storage for object storage?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Azure Storage",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "Amazon S3 and Azure Blob Storage are both highly scalable object storage services that enable users to store and serve large amounts of unstructured data. While both services offer similar features such as data durability, high availability, and data encryption, Amazon S3 provides additional capabilities like Amazon S3 Transfer Acceleration for faster data uploads and Amazon S3 Object Lock for data immutability, whereas Azure Blob Storage offers features like Azure Blob Storage Tiering for automatic data movement between hot and cool storage. Ultimately, the choice between the two services depends on the specific needs and requirements of the application or workload.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "cross-3",
+      "question": "How do AWS IAM and Azure Active Directory compare for access control?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "AWS IAM and Azure Active Directory (Azure AD) both provide robust access control capabilities, but they differ in their approach and integration with other services. AWS IAM is a standalone service that manages access to AWS resources through identity and access management policies, while Azure AD is a cloud-based identity and access management solution that integrates with Azure services and supports hybrid on-premises environments through Azure AD Connect. When comparing the two, AWS IAM is optimized for AWS resources, whereas Azure AD is designed for a broader range of cloud and on-premises applications, including SaaS services like Microsoft 365.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-aws-compute-1",
+      "question": "In AWS, how do I run event-driven code in response to a file upload without managing any servers?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "To run event-driven code in response to a file upload without managing any servers in AWS, you can utilize Amazon S3's event notifications to trigger an AWS Lambda function. When an object is uploaded to an S3 bucket, an event notification is sent to an Amazon SNS topic, which in turn triggers the Lambda function to execute the desired code. This approach allows for serverless execution and decouples the event-driven code from the underlying infrastructure.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-aws-storage-1",
+      "question": "In AWS, how do I host a static website directly from object storage?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "To host a static website directly from object storage in AWS, you can use Amazon S3 as the origin and configure Amazon CloudFront as a content delivery network (CDN) to distribute your website's content. This setup leverages S3's static website hosting feature, which allows you to serve your website directly from S3 buckets, while CloudFront accelerates content delivery and improves performance. By configuring a CloudFront distribution with an S3 origin, you can serve your static website to users worldwide with minimal latency.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-aws-security-1",
+      "question": "In AWS, how do I grant one service permission to call another service without storing credentials in code?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "AWS Identity and Access Management",
+        "Amazon EC2"
+      ],
+      "hypothetical_answer": "To grant one AWS service permission to call another service without storing credentials in code, you can utilize AWS IAM roles and the AWS Service-Linked Role (SLR) feature. Specifically, you can create an IAM role with the necessary permissions for the calling service, and then assign the role to the service using the AWS Service Catalog or AWS CloudFormation. This allows the service to assume the role and access the required resources without requiring hardcoded credentials.",
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-aws-networking-1",
+      "question": "In AWS, how do I make sure my database server is not directly reachable from the internet?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "To ensure your database server is not directly reachable from the internet in AWS, you can utilize a Virtual Private Cloud (VPC) with a subnet that is not exposed to the public internet. By configuring a Network Access Control List (NACL) to deny inbound traffic on the database server's security group, you can prevent direct internet access. Additionally, you can also use an Amazon Elastic Block Store (EBS) volume attached to an Amazon Elastic Compute Cloud (EC2) instance running a database service, and then place the EC2 instance in a private subnet behind a Network Load Balancer (NL",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-azure-compute-1",
+      "question": "In Azure, how do I run code triggered by an HTTP request without provisioning or managing a server?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "Azure Functions",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "To run code triggered by an HTTP request without provisioning or managing a server in Azure, you can utilize Azure Functions, a serverless compute service that allows you to execute code in response to events such as HTTP requests. By creating an HTTP-triggered Azure Function using the HTTP trigger template, you can write code in languages like C#, JavaScript, or Python that will be executed when an HTTP request is received by the Azure Functions runtime. This approach eliminates the need for server provisioning and management, as Azure Functions automatically scales to handle incoming requests.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-azure-security-1",
+      "question": "In Azure, how do I enforce two-factor authentication for all users in my organization?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "Azure Active Directory"
+      ],
+      "hypothetical_answer": "To enforce two-factor authentication (2FA) for all users in your Azure organization, you can enable Azure Active Directory (Azure AD) Conditional Access policies with the \"Require multi-factor authentication\" condition. This can be done by navigating to Azure AD > Security > Conditional Access > New policy, selecting the \"Users and groups\" condition to include all users, and then selecting the \"Require multi-factor authentication\" condition. Once configured, all users will be required to complete a 2FA challenge when signing in to Azure resources.",
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-gcp-database-1",
+      "question": "In Google Cloud, what managed service should I use if I need to run a MySQL or PostgreSQL database?",
+      "category": "database",
+      "expected_sources": [
+        "GCP Cloud SQL"
+      ],
+      "retrieved_titles": [
+        "GCP Cloud SQL",
+        "GCP Cloud SQL",
+        "GCP VPC"
+      ],
+      "hypothetical_answer": "To run a MySQL or PostgreSQL database in Google Cloud, consider utilizing the Cloud SQL service, which provides a fully-managed relational database experience. Cloud SQL supports both MySQL and PostgreSQL, offering features such as automated backups, replication, and patching, as well as integration with other Google Cloud services like Cloud Storage and Cloud Functions. By leveraging Cloud SQL, you can focus on application development while relying on Google Cloud's expertise to manage your database infrastructure.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-gcp-networking-1",
+      "question": "In Google Cloud, how do I create an isolated private network for my resources?",
+      "category": "networking",
+      "expected_sources": [
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "GCP VPC",
+        "Amazon VPC"
+      ],
+      "hypothetical_answer": "To create an isolated private network for your resources in Google Cloud, you can use the Google Cloud Virtual Private Cloud (VPC) service to create a custom network with a unique IP address range. You can then use the VPC Network Peering feature to connect your custom network to other VPC networks, or use the VPC Network Routing feature to route traffic between your custom network and other Google Cloud services. Additionally, you can use the Google Cloud Network Policy feature to define network access controls and isolate your resources from the rest of the network.",
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-any-vm-1",
+      "question": "How do I rent a virtual machine in the cloud where I have full control over the operating system?",
+      "category": "compute",
+      "expected_sources": [
+        "Amazon EC2",
+        "Azure Virtual Machines",
+        "GCP Compute"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon EC2",
+        "Amazon EC2"
+      ],
+      "hypothetical_answer": "To provision a virtual machine with full control over the operating system, navigate to the Compute section of the AWS Management Console and launch a new instance of Amazon EC2, selecting a supported operating system from the Amazon Machine Image (AMI) catalog. Choose a suitable instance type from the list of available Amazon EC2 instances, such as a c5.xlarge instance, and configure the instance details, including the root volume and security group settings. Once the instance is launched, you can connect to it using SSH or RDP, depending on the chosen operating system.",
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "implicit-any-serverless-1",
+      "question": "What is the cheapest way to run short background tasks without paying for idle server time?",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions",
+        "GCP Cloud Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "To minimize costs for short background tasks, consider utilizing AWS Lambda functions, which charge only for the compute time consumed by the function execution, rather than idle server time. By leveraging AWS Lambda's event-driven architecture and pay-per-use pricing model, you can run short tasks without incurring unnecessary costs. Additionally, you can also utilize AWS Step Functions to orchestrate and manage your Lambda functions, further optimizing your cloud resource utilization.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-object-storage-1",
+      "question": "How do I store large files like images and videos durably and cheaply in the cloud?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "To store large files like images and videos durably and cheaply in the cloud, consider utilizing Amazon S3's Infrequent Access (IA) storage class, which offers lower storage costs for objects that are accessed less frequently. Additionally, you can leverage Amazon S3's multipart upload feature to efficiently upload large files, and use Amazon S3's lifecycle policies to automatically transition files to the IA storage class after a specified period of time. This approach enables cost-effective and durable storage of large files in the cloud.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-db-failover-1",
+      "question": "How do I set up automatic failover so my relational database keeps serving traffic if one availability zone fails?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS",
+        "Azure SQL Database",
+        "GCP Cloud SQL"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "To set up automatic failover for your relational database, you can use Amazon RDS Multi-AZ deployments, which replicate your database instance across two or more Availability Zones (AZs) within the same region. When one AZ fails, Amazon RDS automatically switches to the standby instance in the other AZ, ensuring minimal downtime and continuous database availability. This setup is also known as a \"warm standby\" configuration, where the standby instance is continuously updated and ready to take over in case of a failure.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-iam-1",
+      "question": "How do I control which users and services are allowed to access specific cloud resources?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "To control access to specific cloud resources, you can utilize Identity and Access Management (IAM) policies within AWS to define permissions and roles for users and services. By creating IAM policies that specify the actions allowed on a particular resource, such as an Amazon S3 bucket or an Amazon EC2 instance, you can restrict access to only authorized entities. Additionally, you can use AWS Organizations to manage permissions across multiple accounts and apply consistent access controls across your cloud environment.",
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "implicit-any-private-network-1",
+      "question": "How do I connect my cloud environment to my office network so internal traffic never crosses the public internet?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC",
+        "Azure Virtual Network",
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
+      ],
+      "hypothetical_answer": "To establish a secure connection between your cloud environment and office network without traversing the public internet, you can utilize a Virtual Private Network (VPN) connection between your Amazon Virtual Private Cloud (VPC) and your on-premises network via a Site-to-Site VPN (S2S VPN) using AWS Site-to-Site VPN and AWS Direct Connect. This setup enables you to establish a secure, encrypted tunnel between your cloud and on-premises networks, allowing for seamless communication without exposing your internal traffic to the public internet. By leveraging AWS Direct Connect, you can also establish a dedicated,",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-any-cold-storage-1",
+      "question": "How do I archive old application logs to reduce storage costs while keeping them recoverable?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "To archive old application logs and reduce storage costs while maintaining recoverability, you can utilize Amazon S3's lifecycle policies to automatically transfer infrequently accessed log files to Amazon Glacier, a low-cost, durable storage service. This process, known as \"cold storage,\" allows you to store logs for extended periods while minimizing storage costs. Additionally, you can use AWS CloudTrail to capture and store log events in Amazon S3, enabling you to easily retrieve and analyze logs as needed.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-serverless-1",
+      "question": "Which has better support for running serverless event-driven workloads \u00e2\u20ac\u201d AWS or Azure?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "AWS Lambda provides robust support for running serverless event-driven workloads, leveraging the power of Amazon CloudWatch Events to trigger and manage functions in response to various event sources, such as Amazon S3 object uploads or Amazon DynamoDB item updates. In contrast, Azure Functions also supports serverless event-driven workloads, but its event-driven capabilities are more closely tied to Azure Event Grid, which requires additional configuration to achieve similar scalability and reliability as AWS Lambda. Overall, AWS Lambda's seamless integration with other AWS services gives it a slight edge in supporting complex serverless workloads.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-networking-1",
+      "question": "Compare how AWS and Google Cloud isolate and segment network traffic between workloads.",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon VPC",
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon VPC",
+        "GCP VPC",
+        "Amazon VPC"
+      ],
+      "hypothetical_answer": "In AWS, network traffic isolation and segmentation between workloads can be achieved through the use of Virtual Private Cloud (VPC) subnets, security groups, and Network Access Control Lists (NACLs), which provide a layer of abstraction and control over traffic flow between instances. In contrast, Google Cloud Platform (GCP) utilizes Virtual Private Cloud (VPC) networks, subnets, and firewall rules to isolate and segment network traffic, with the added benefit of Cloud Router for dynamic routing and peering between VPCs. This allows for more granular control over network traffic flow and segmentation in",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-database-1",
+      "question": "How do the managed database services in AWS and Azure handle backups and point-in-time recovery?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon RDS",
+        "Azure SQL Database"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "In AWS, managed database services such as Amazon RDS and Amazon DocumentDB utilize automated backups and point-in-time recovery (PITR) through the use of snapshots and transaction logs, which are stored in Amazon S3 and Amazon DynamoDB respectively. This allows for the recovery of database instances to any point in time within a specified retention period, typically up to 35 days. Additionally, AWS Database Migration Service (DMS) provides a managed service for migrating databases to AWS, which also supports PITR and automated backups.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-identity-1",
+      "question": "How do the identity and access management approaches differ between Google Cloud and Microsoft Azure?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "GCP IAM",
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "GCP IAM",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "Google Cloud Identity and Access Management (IAM) utilizes a hierarchical permission model, where roles and permissions are assigned to service accounts and users through Identity-Aware Proxy (IAP) and Cloud Identity, whereas Microsoft Azure Active Directory (Azure AD) relies on a claims-based authentication model, integrating with Azure Role-Based Access Control (RBAC) to manage access to Azure resources. This difference in approach affects how administrators manage access and permissions across their respective cloud environments. Specifically, Google Cloud IAM focuses on a more granular, permission-based model, whereas Azure AD emphasizes a more centralized, identity-driven approach.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "implicit-cross-storage-cost-1",
+      "question": "How do AWS and Azure handle cost optimization for storing data that is rarely accessed?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "For infrequently accessed data, AWS recommends utilizing Amazon S3's Infrequent Access (IA) storage class, which provides a lower storage cost compared to Standard storage, while still ensuring data availability within 3 hours. Similarly, Azure offers the Cool Storage class, which is designed for data that is accessed less frequently, offering a lower cost per GB compared to Hot Storage, while maintaining a retrieval time of 15 minutes. By leveraging these storage classes, users can optimize costs for storing rarely accessed data.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-biz-001",
+      "question": "We need a cheap and durable place to store millions of small customer photos that our web app serves to users globally.",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "To store millions of small customer photos, consider utilizing Amazon S3's (Simple Storage Service) durable and scalable object storage capabilities, which provide a cost-effective solution for storing and serving static assets globally through Amazon CloudFront's content delivery network (CDN). By leveraging S3's versioning and lifecycle management features, you can efficiently manage and optimize storage costs for your photos. Additionally, S3's integration with AWS IAM (Identity and Access Management) ensures secure access control and authentication for your stored assets.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-biz-002",
+      "question": "Our confirmation email handler runs for 200ms and fires about 50 times a day. We want to pay only when it actually executes, not for idle time.",
+      "category": "compute",
+      "expected_sources": [
+        "AWS Lambda",
+        "Azure Functions",
+        "GCP Cloud Functions"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "To optimize costs for your confirmation email handler, consider utilizing Amazon CloudWatch Events to trigger your Lambda function only when a new email is received, eliminating idle execution time. You can configure your function to be invoked via an Amazon SNS topic, which can be triggered by an Amazon SES email receipt event, thereby reducing the number of invocations to match the actual email volume. This approach will allow you to pay only for the execution time of your Lambda function when it is actually processing emails.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-biz-003",
+      "question": "How do I make sure a developer can push code to production but cannot drop or modify the production database schema?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "To enforce this security policy, you can utilize AWS IAM roles and Amazon CloudFormation to create a least-privileged developer account that has write access to the production code repository via AWS CodeCommit, but only read-only access to the production database schema via Amazon RDS. By using AWS IAM's resource-based policies, you can restrict the developer's ability to execute database schema modifications, such as dropping or altering tables, by denying the necessary permissions on the Amazon RDS instance. This ensures that the developer can push code to production without compromising the integrity of the database schema.",
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-biz-004",
+      "question": "My web servers need to serve internet traffic, but my database servers should have no inbound or outbound internet access at all.",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC",
+        "Azure Virtual Network",
+        "GCP VPC"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon VPC"
+      ],
+      "hypothetical_answer": "To isolate your database servers from the internet while allowing your web servers to serve traffic, you can utilize a combination of AWS Network Load Balancer (NLB) and AWS Security Groups. Configure the NLB to direct incoming internet traffic to your web servers, which can be placed in a public subnet with a Security Group that allows inbound traffic on the necessary ports. Meanwhile, place your database servers in a private subnet with a Security Group that denies all inbound and outbound traffic, except for communication between the database servers and the web servers via a private IP address.",
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "hard-biz-005",
+      "question": "Our database becomes unavailable for several minutes every time AWS patches the underlying hardware. How do we eliminate that downtime?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "To minimize downtime during AWS Maintenance Windows, consider utilizing Amazon RDS Multi-AZ deployments, which automatically fail over to a standby instance in a different Availability Zone when the primary instance is undergoing maintenance. Alternatively, you can leverage Amazon Aurora Serverless, which provides automatic instance replacement and scaling, reducing the likelihood of downtime during maintenance events. By implementing these strategies, you can ensure high availability and minimize the impact of underlying hardware patches on your database.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-equiv-001",
+      "question": "What is Google Cloud's equivalent of an Amazon EC2 instance?",
+      "category": "compute",
+      "expected_sources": [
+        "GCP Compute"
+      ],
+      "retrieved_titles": [
+        "GCP VPC",
+        "GCP Compute",
+        "GCP Compute"
+      ],
+      "hypothetical_answer": "In Google Cloud Platform (GCP), a virtual machine (VM) instance is equivalent to an Amazon EC2 instance. Google Compute Engine (GCE) provides scalable and on-demand VM instances, such as n1-standard-1 or n1-highcpu-8, which can be deployed in various regions and zones. These instances can be managed using the Compute Engine API or the Google Cloud Console.",
+      "hit": true,
+      "rank": 2
+    },
+    {
+      "id": "hard-equiv-002",
+      "question": "What does Microsoft Azure call its serverless code execution service, the equivalent of AWS Lambda?",
+      "category": "compute",
+      "expected_sources": [
+        "Azure Functions"
+      ],
+      "retrieved_titles": [
+        "Azure Functions",
+        "Azure Functions",
+        "AWS Lambda"
+      ],
+      "hypothetical_answer": "Microsoft Azure refers to its serverless code execution service as Azure Functions, which allows developers to execute event-driven code without provisioning or managing servers. Azure Functions supports various programming languages, including C#, Java, and Python, and integrates seamlessly with other Azure services such as Azure Storage and Azure Cosmos DB. This serverless architecture enables scalable and on-demand execution of code in response to events triggered by Azure Event Grid, Azure Storage queues, or HTTP requests.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-equiv-003",
+      "question": "What is the AWS service for storing files and objects that is equivalent to Azure Blob Storage?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "The AWS service for storing files and objects equivalent to Azure Blob Storage is Amazon S3 (Simple Storage Service). Amazon S3 is an object storage service that allows users to store and serve large amounts of data, such as images, videos, and documents, in a highly durable and scalable manner. With features like versioning, lifecycle management, and cross-region replication, Amazon S3 provides a robust and secure solution for storing and managing data in the cloud.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-equiv-004",
+      "question": "What does AWS call its managed relational database service, the equivalent of Azure SQL Database?",
+      "category": "database",
+      "expected_sources": [
+        "Amazon RDS"
+      ],
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "AWS provides a managed relational database service called Amazon RDS (Relational Database Service), which supports popular database engines such as MySQL, PostgreSQL, and Oracle. Amazon RDS offers a scalable and highly available database solution, leveraging features like Multi-AZ deployments and automated backups to ensure high uptime and data durability. By utilizing Amazon RDS, customers can focus on application development without the complexities of database administration.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-equiv-005",
+      "question": "What is the Azure service that plays the same role as AWS IAM for controlling who can access cloud resources?",
+      "category": "security",
+      "expected_sources": [
+        "Azure Active Directory"
+      ],
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "Azure Active Directory"
+      ],
+      "hypothetical_answer": "Azure Active Directory (Azure AD) and Azure Role-Based Access Control (Azure RBAC) collectively serve as the primary identity and access management (IAM) solution for Azure, analogous to AWS Identity and Access Management (IAM). Azure AD provides user authentication and authorization, while Azure RBAC manages access to Azure resources based on user roles and permissions. This combination enables administrators to centrally manage access to Azure resources, such as virtual machines, storage accounts, and Azure Kubernetes Service (AKS) clusters.",
+      "hit": true,
+      "rank": 3
+    },
+    {
+      "id": "hard-failure-001",
+      "question": "My AWS Lambda function times out every time it tries to connect to my RDS database. The function works fine connecting to external APIs. What is likely misconfigured?",
+      "category": "networking",
+      "expected_sources": [
+        "Amazon VPC"
+      ],
+      "retrieved_titles": [
+        "AWS Lambda",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "When attempting to connect to an Amazon RDS database from an AWS Lambda function, ensure that the VPC configuration is properly set up to allow outbound internet access for the Lambda function's execution role. Specifically, verify that the Lambda function's execution role has the necessary permissions to access the RDS database instance, and that the RDS database instance is not configured to require SSL/TLS encryption, which may be causing the timeout due to the Lambda function's default SSL/TLS handshake timeout. Additionally, check that the Lambda function's VPC security group allows outbound traffic to the RDS database instance's security",
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-failure-002",
+      "question": "We left our storage bucket publicly readable by accident and 10TB of data was downloaded overnight, costing us thousands of dollars. What controls should have been in place?",
+      "category": "storage",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage",
+        "GCP Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "AWS Identity and Access Management"
+      ],
+      "hypothetical_answer": "To prevent unauthorized access to storage buckets, AWS customers should enable Bucket Policy versioning and configure the Bucket Policy to restrict access to only trusted IP addresses or IAM roles, utilizing the `Principal` element to specify the allowed entities. Additionally, enabling Server-Side Encryption (SSE) with AWS Key Management Service (KMS) keys can further secure bucket contents. By implementing these controls, customers can ensure that their storage buckets are properly secured and protected from unintended access.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-failure-003",
+      "question": "A junior developer deleted the production database because they had the same admin permissions as the database team. What access control change would have prevented this?",
+      "category": "security",
+      "expected_sources": [
+        "AWS Identity and Access Management",
+        "Azure Active Directory",
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "hypothetical_answer": "To prevent unauthorized deletion of the production database, the database team should have implemented a least privilege access control model, restricting the junior developer's permissions to only allow read-only access to the database using IAM roles and policies, specifically by denying the 'rds:DeleteDBInstance' action in the database team's IAM policy attached to the junior developer's role. This would have prevented the junior developer from deleting the database, even with admin permissions. By doing so, the database team can ensure that only authorized personnel can perform critical actions on production resources.",
+      "hit": false,
+      "rank": null
+    },
+    {
+      "id": "hard-term-001",
+      "question": "What is the difference between a bucket in AWS and a container in Azure when storing files in the cloud?",
+      "category": "cross-provider",
+      "expected_sources": [
+        "Amazon S3",
+        "Azure Storage"
+      ],
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "hypothetical_answer": "In Amazon Web Services (AWS), a bucket is a top-level container used to store and serve objects, such as files and images, in the S3 (Simple Storage Service) storage system. In contrast, Azure Blob Storage uses a container as a hierarchical namespace to organize and store blobs, which are similar to objects in S3. While both buckets and containers serve as a root directory for storing files, the key difference lies in the hierarchical structure and namespace management provided by each service.",
+      "hit": true,
+      "rank": 1
+    },
+    {
+      "id": "hard-term-002",
+      "question": "What does GCP call the mechanism for defining which actions a service account is allowed to perform, similar to an AWS IAM policy?",
+      "category": "security",
+      "expected_sources": [
+        "GCP IAM"
+      ],
+      "retrieved_titles": [
+        "GCP IAM",
+        "GCP IAM",
+        "GCP IAM"
+      ],
+      "hypothetical_answer": "In Google Cloud Platform (GCP), the mechanism for defining which actions a service account is allowed to perform is referred to as a \"Cloud Identity and Access Management (IAM) policy.\" This policy is a collection of permissions that specify the actions a service account can perform on GCP resources, such as creating or deleting Cloud Storage buckets or modifying Cloud Functions. IAM policies are defined using a JSON or YAML file and are applied to service accounts to control their access to GCP resources.",
+      "hit": true,
+      "rank": 1
+    }
+  ]
+}

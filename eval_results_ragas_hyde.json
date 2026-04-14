@@ -1,0 +1,153 @@
+{
+  "method": "hyde",
+  "n": 10,
+  "judge_model": "llama-3.1-8b-instant",
+  "judge_limitation": "same model as generator \u2014 may not reliably detect own hallucinations",
+  "summary": {
+    "context_precision": 0.3,
+    "context_recall": 0.8229,
+    "answer_correctness": 0.52
+  },
+  "results": [
+    {
+      "id": "implicit-any-private-network-1",
+      "question": "How do I connect my cloud environment to my office network so internal traffic never crosses the public internet?",
+      "category": "networking",
+      "retrieved_titles": [
+        "Amazon VPC",
+        "Amazon VPC",
+        "Amazon VPC"
+      ],
+      "generated_answer": "Use a VPN connection (AWS Virtual Private Network - Site-to-Site VPN) to connect your VPCs to your on-premises networks.",
+      "context_precision": 0.3333,
+      "context_recall": 0.3333,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "aws-rds-2",
+      "question": "What is RDS Multi-AZ deployment and why would you use it?",
+      "category": "database",
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "generated_answer": "RDS Multi-AZ deployment is a feature that replicates your DB instance to a standby instance in a different Availability Zone (AZ). This is done to provide high availability and disaster recovery capabilities. You would use it to ensure that your database remains accessible even in the event of an AZ failure or maintenance.",
+      "context_precision": 0.0,
+      "context_recall": 1.0,
+      "answer_correctness": 0.9
+    },
+    {
+      "id": "aws-lambda-2",
+      "question": "How does AWS Lambda scale automatically?",
+      "category": "compute",
+      "retrieved_titles": [
+        "AWS Lambda",
+        "AWS Lambda",
+        "AWS Lambda"
+      ],
+      "generated_answer": "AWS Lambda scales automatically, with the need to manage servers.",
+      "context_precision": 0.3333,
+      "context_recall": 2.0,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "hard-biz-001",
+      "question": "We need a cheap and durable place to store millions of small customer photos that our web app serves to users globally.",
+      "category": "storage",
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "generated_answer": "Amazon S3 is a suitable choice due to its industry-leading scalability, data availability, security, and performance, making it an ideal place to store millions of small customer photos.",
+      "context_precision": 0.3333,
+      "context_recall": null,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "azure-sql-2",
+      "question": "What is an Azure SQL Database elastic pool?",
+      "category": "database",
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Azure SQL Database"
+      ],
+      "generated_answer": "There is no information about Azure SQL Database elastic pool in the provided context. The context only discusses Amazon RDS and AWS services.",
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "answer_correctness": 0.0
+    },
+    {
+      "id": "azure-storage-2",
+      "question": "What are the Azure Blob Storage access tiers?",
+      "category": "storage",
+      "retrieved_titles": [
+        "Azure Storage",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "generated_answer": "There is no information about Azure Blob Storage access tiers in the provided context. The context only mentions Azure Storage options, but it does not specify the access tiers for Azure Blob Storage.",
+      "context_precision": 0.3333,
+      "context_recall": 0.6667,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "azure-storage-1",
+      "question": "What types of storage does Azure Storage provide?",
+      "category": "storage",
+      "retrieved_titles": [
+        "Azure Storage",
+        "Azure Virtual Machines",
+        "Azure Storage"
+      ],
+      "generated_answer": "Azure Storage provides the following types of storage:\n\n1. Object storage\n2. File storage\n3. Block storage",
+      "context_precision": 0.3333,
+      "context_recall": 1.0,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "aws-iam-1",
+      "question": "What is AWS IAM and what problems does it solve?",
+      "category": "security",
+      "retrieved_titles": [
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management",
+        "AWS Identity and Access Management"
+      ],
+      "generated_answer": "AWS IAM (Identity and Access Management) is a web service that helps you securely control access to AWS resources. It solves the problems of authentication and authorization by managing permissions that control which AWS resources users can access.",
+      "context_precision": 0.3333,
+      "context_recall": 0.75,
+      "answer_correctness": 0.8
+    },
+    {
+      "id": "hard-failure-002",
+      "question": "We left our storage bucket publicly readable by accident and 10TB of data was downloaded overnight, costing us thousands of dollars. What controls should have been in place?",
+      "category": "storage",
+      "retrieved_titles": [
+        "Amazon S3",
+        "Amazon S3",
+        "Amazon S3"
+      ],
+      "generated_answer": "S3 Block Public Access should have been enabled to block public access to the S3 bucket and objects.",
+      "context_precision": 0.6667,
+      "context_recall": null,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "aws-rds-1",
+      "question": "What database engines does Amazon RDS support?",
+      "category": "database",
+      "retrieved_titles": [
+        "Amazon RDS",
+        "Amazon RDS",
+        "Amazon RDS"
+      ],
+      "generated_answer": "Amazon RDS supports the following database engines: IBM Db2, MariaDB, Microsoft SQL Server, MySQL, Oracle Database, and PostgreSQL.",
+      "context_precision": 0.3333,
+      "context_recall": 0.8333,
+      "answer_correctness": 0.5
+    }
+  ]
+}
